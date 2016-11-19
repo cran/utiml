@@ -137,7 +137,7 @@ mlpredict <- function(model, newdata, ...) {
 #' @describeIn mltrain Default S3 method
 #' @export
 mltrain.default <- function(object, ...) {
-  funcname <- paste("mltrain.base", object$methodname, sep = "")
+  funcname <- paste("mltrain.base", object$base.method, sep = "")
   stop(paste("The function '", funcname, "(object, ...)' is not implemented",
              sep = ""))
 }
@@ -155,9 +155,8 @@ mlpredict.default <- function(model, newdata, ...) {
 #' @export
 mltrain.baseSVM <- function(object, ...) {
   if (requireNamespace("e1071", quietly = TRUE)) {
-    traindata <- object$data[, -object$labelindex]
-    labeldata <- object$data[, object$labelindex]
-    model <- e1071::svm(traindata, labeldata, probability = TRUE, ...)
+    formula <- stats::as.formula(paste("`", object$labelname, "` ~ .", sep=""))
+    model <- e1071::svm(formula, object$data, probability = TRUE, ...)
   }
   else {
     stop(paste("There are no installed package 'e1071' to use SVM classifier",
@@ -181,6 +180,40 @@ mlpredict.svm <- function(model, newdata, ...) {
   data.frame(
     prediction = prediction,
     probability = all.prob[cbind(rownames(newdata), prediction)],
+    row.names = rownames(newdata)
+  )
+}
+
+# SMO METHOD -------------------------------------------------------------
+#' @describeIn mltrain SMO implementation (require \pkg{RWeka} package to use)
+#' @export
+mltrain.baseSMO <- function(object, ...) {
+  if (requireNamespace("RWeka", quietly = TRUE) &&
+      requireNamespace("rJava", quietly = TRUE)) {
+    formula <- stats::as.formula(paste("`", object$labelname, "` ~ .", sep=""))
+    model <- RWeka::SMO(formula, object$data, ...)
+    rJava::.jcache(model$classifier)
+  }
+  else {
+    stop(paste("There are no installed package 'RWeka' and 'rJava' to use SMO",
+               "classifier as base method"))
+  }
+  model
+}
+
+#' @describeIn mlpredict SMO implementation (require \pkg{RWeka} package to use)
+#' @export
+mlpredict.SMO <- function(model, newdata, ...) {
+  if (!requireNamespace("RWeka", quietly = TRUE)) {
+    stop(paste("There are no installed package 'RWeka' to use SMO classifier",
+               "as base method"))
+  }
+
+  result <- stats::predict(model, newdata, type = "probability", ...)
+  prediction <- colnames(result)[apply(result, 1, which.max)]
+  data.frame(
+    prediction = prediction,
+    probability = result[cbind(rownames(newdata), prediction)],
     row.names = rownames(newdata)
   )
 }
@@ -227,9 +260,8 @@ mlpredict.J48 <- function(model, newdata, ...) {
 #' @export
 mltrain.baseC5.0 <- function(object, ...) {
   if (requireNamespace("C50", quietly = TRUE)) {
-    traindata <- object$data[, -object$labelindex]
-    labeldata <- object$data[, object$labelindex]
-    model <- C50::C5.0(traindata, labeldata, ...)
+    formula <- stats::as.formula(paste("`", object$labelname, "` ~ .", sep=""))
+    model <- C50::C5.0(formula, object$data, ...)
   }
   else {
     stop(paste("There are no installed package 'C50' to use C5.0 classifier",
@@ -277,6 +309,7 @@ mlpredict.rpart <- function(model, newdata, ...) {
                "as base method"))
   }
   result <- stats::predict(model, newdata, type = "prob", ...)
+  rownames(result) <- rownames(newdata)
   prediction <- colnames(result)[apply(result, 1, which.max)]
   data.frame(
     prediction = prediction,
@@ -311,8 +344,7 @@ mlpredict.randomForest <- function(model, newdata, ...) {
                "randomForest classifier as base method"))
   }
 
-  result <- stats::predict(model, newdata,
-                                                type = "prob", ...)
+  result <- stats::predict(model, newdata, type = "prob", ...)
   prediction <- colnames(result)[apply(result, 1, which.max)]
   data.frame(
     prediction = prediction,
@@ -327,9 +359,15 @@ mlpredict.randomForest <- function(model, newdata, ...) {
 #' @export
 mltrain.baseNB <- function(object, ...) {
   if (requireNamespace("e1071", quietly = TRUE)) {
-    traindata <- object$data[, -object$labelindex]
-    labeldata <- object$data[, object$labelindex]
-    model <- e1071::naiveBayes(traindata, labeldata, type = "raw", ...)
+    formula <- stats::as.formula(paste("`", object$labelname, "` ~ .", sep=""))
+
+    #Avoid error because there are only one positive instance
+    duplicate <- any(table(object$data[,object$labelname]) == 1)
+    model <- e1071::naiveBayes(formula, rbind(object$data,
+                                              utiml_ifelse(duplicate,
+                                                           object$data,
+                                                           NULL)),
+                               type = "raw", ...)
   }
   else {
     stop(paste("There are no installed package 'e1071' to use naiveBayes",
@@ -346,12 +384,13 @@ mlpredict.naiveBayes <- function(model, newdata, ...) {
     stop(paste("There are no installed package 'e1071' to use naiveBayes",
                "classifier as base method"))
   }
+
   result <- stats::predict(model, newdata, type = "raw", ...)
   rownames(result) <- rownames(newdata)
-  prediction <- colnames(result)[apply(result, 1, which.max)]
+  classes <- colnames(result)[apply(result, 1, which.max)]
   data.frame(
-    prediction = prediction,
-    probability = result[cbind(rownames(newdata), prediction)],
+    prediction = classes,
+    probability = result[cbind(rownames(newdata), classes)],
     row.names = rownames(newdata)
   )
 }
@@ -380,11 +419,12 @@ mlpredict.baseKNN <- function(model, newdata, ...) {
   formula <- stats::as.formula(paste("`", model$labelname, "` ~ .", sep = ""))
   args <- list(...)
   if (is.null(model$extrakNN[["k"]]) || !is.null(args[["k"]])) {
-    result <- kknn::kknn(formula, model$data, newdata, ...)
+    result <- kknn::kknn(formula, rep_nom_attr(model$data, FALSE),
+                         rep_nom_attr(newdata), ...)
   }
   else {
-    result <- kknn::kknn(formula, model$data, newdata,
-                         k = model$extrakNN[["k"]], ...)
+    result <- kknn::kknn(formula, rep_nom_attr(model$data, FALSE),
+                         rep_nom_attr(newdata), k = model$extrakNN[["k"]], ...)
   }
 
   prediction <- as.character(result$fitted.values)
@@ -393,6 +433,65 @@ mlpredict.baseKNN <- function(model, newdata, ...) {
   data.frame(
     prediction = prediction,
     probability = all.prob[cbind(rownames(newdata), prediction)],
+    row.names = rownames(newdata)
+  )
+}
+
+# XGBoost METHOD ------------------------------------------------------------------
+#' @describeIn mltrain XGBoost implementation (require \pkg{xgboost} package)
+#' @export
+mltrain.baseXGB <- function(object, ...) {
+  if (!requireNamespace("xgboost", quietly = TRUE)) {
+    stop(paste("There are no installed package 'xgboost' to use xgboost",
+               "classifier as base method"))
+  }
+
+  def.args <- list(
+    data = as.matrix(rep_nom_attr(object$data[, -object$labelindex])),
+    label = as.numeric(object$data[, object$labelindex]) - 1,
+    nthread = 1,
+    nrounds = 3,
+    verbose = FALSE,
+    silent = 1,
+    objective = ifelse(nlevels(object$data[, object$labelindex]) == 2,
+                       "binary:logistic", "multi:softprob")
+  )
+  if (nlevels(object$data[, object$labelindex]) > 2) {
+    def.args$num_class <- nlevels(object$data[, object$labelindex])
+  }
+  args <- list(...)
+  for (narg in names(args)) {
+    def.args[[narg]] <- args[[narg]]
+  }
+
+  model <- do.call(xgboost::xgboost, def.args)
+  attr(model, "classes") <- levels(object$data[, object$labelindex])
+  model
+}
+
+#' @describeIn mlpredict XGBoost implementation (require \pkg{xgboost} package)
+#' @export
+mlpredict.xgb.Booster <- function(model, newdata, ...) {
+  if (!requireNamespace("xgboost", quietly = TRUE)) {
+    stop(paste("There are no installed package 'xgboost' to use xgboost",
+               "classifier as base method"))
+  }
+
+  classes <- attr(model, "classes")
+  pred <- xgboost::predict(model, as.matrix(rep_nom_attr(newdata)), ...)
+  if (length(classes) == 2) {
+    bipartitions <- as.numeric(pred >= 0.5)
+    probabilities <- ifelse(bipartitions == 1, pred, 1 - pred)
+  } else {
+    pred <- matrix(pred, nrow=nrow(newdata), byrow = TRUE)
+    which.pred <- apply(pred, 1, which.max)
+    bipartitions <- classes[which.pred]
+    probabilities <- pred[cbind(seq(nrow(newdata)), which.pred)]
+  }
+
+  data.frame(
+    prediction = bipartitions,
+    probability = probabilities,
     row.names = rownames(newdata)
   )
 }
@@ -439,6 +538,16 @@ mlpredict.randomModel <- function(model, newdata, ...) {
     probability = sapply(stats::runif(nrow(newdata)), function (score) {
       max(score, 1 - score)
     }),
+    row.names = rownames(newdata)
+  )
+}
+
+#' @describeIn mlpredict Empty model to fix the cases with few train examples
+#' @export
+mlpredict.emptyModel <- function (model, newdata, ...) {
+  data.frame(
+    prediction = rep(0, nrow(newdata)),
+    probability = rep(1, nrow(newdata)),
     row.names = rownames(newdata)
   )
 }

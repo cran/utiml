@@ -4,7 +4,8 @@
     utiml.base.method = "SVM",
     utiml.cores = 1,
     utiml.seed = NA,
-    utiml.use.probs = TRUE
+    utiml.use.probs = TRUE,
+    utiml.empty.prediction = FALSE
   )
   toset <- !(names(op.utiml) %in% names(op))
   if (any(toset)) options(op.utiml[toset])

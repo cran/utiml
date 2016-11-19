@@ -47,6 +47,11 @@ test_that("Normalize data", {
   }
   expect_equal(new.data$dataset[, 6], mdata$dataset[, 6])
   expect_equal(new.data$name, mdata$name)
+
+  #Test Scale with a single value
+  mdata$dataset$X1 <- rep(1,100)
+  new.data <- normalize_mldata(mdata)
+  expect_equal(new.data$dataset$X1, mdata$dataset$X1)
 })
 
 test_that("Remove examples and attributes", {
@@ -156,6 +161,12 @@ test_that("Replace nominal attributes", {
   expect_equal(new.data$dataset[,"X1_abc"], as.numeric(df$X1 == "abc"))
   expect_equal(new.data$dataset[,"X1_bcd"], as.numeric(df$X1 == "bcd"))
   expect_equal(new.data$name, mdata$name)
+
+  data <- matrix(rnorm(15), ncol=3)
+  colnames(data) <- c("p1", "p2", "p3")
+  rownames(data) <- 1:5
+  expect_equal(as.data.frame(data), rep_nom_attr(data))
+  expect_equal(as.data.frame(data), rep_nom_attr(data, FALSE))
 })
 
 test_that("Alternatives datasets", {

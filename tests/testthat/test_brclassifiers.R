@@ -210,6 +210,9 @@ test_that("Prudent", {
   #TODO pred <- baseTest(model, "PruDentmodel")
 
   expect_error(prudent(train, "RANDOM", phi=1.1))
+
+  #utiml_labels_IG
+
 })
 
 test_that("RDBR", {
@@ -223,4 +226,17 @@ test_that("RDBR", {
 
   model <- dbr(train, "RANDOM", estimate = FALSE)
   expect_error(predict(model, test))
+})
+
+
+test_that("LIFT", {
+  model <- lift(train, "RANDOM")
+  baseTest(model, "LIFTmodel")
+})
+
+test_that("HOMER", {
+  model <- homer(train, "RANDOM")
+  expect_is(model, "HOMERmodel")
+  model <- homer(train, "RANDOM", clusters=2, method="random")
+  expect_error(homer(train, "RANDOM", clusters=0))
 })

@@ -158,9 +158,9 @@ test_that("random kfold", {
   testFolds(f3, mdata, "f3 Random kfolds")
   expect_equal(f3$k, 3)
   expect_equal(length(unlist(f3$fold)), 100)
-  expect_more_than(length(f3$fold[[1]]), 32)
-  expect_more_than(length(f3$fold[[2]]), 32)
-  expect_more_than(length(f3$fold[[3]]), 32)
+  expect_gt(length(f3$fold[[1]]), 32)
+  expect_gt(length(f3$fold[[2]]), 32)
+  expect_gt(length(f3$fold[[3]]), 32)
 
   ds <- create_holdout_partition(mdata, c("train" = 0.9, "test" = 0.1))
   f4 <- create_kfold_partition(ds$train, 9)
@@ -201,9 +201,9 @@ test_that("stratified kfold", {
   testFolds(f3, mdata, "f3 Stratified kfold")
   expect_equal(f3$k, 3)
   expect_equal(length(unlist(f3$fold)), 100)
-  expect_more_than(length(f3$fold[[1]]), 32)
-  expect_more_than(length(f3$fold[[2]]), 32)
-  expect_more_than(length(f3$fold[[3]]), 32)
+  expect_gt(length(f3$fold[[1]]), 32)
+  expect_gt(length(f3$fold[[2]]), 32)
+  expect_gt(length(f3$fold[[3]]), 32)
 
   ds <- create_holdout_partition(mdata, c("train" = 0.9, "test" = 0.1))
   f4 <- create_kfold_partition(ds$train, 9, "stratified")
@@ -219,7 +219,7 @@ test_that("iterative kfold", {
   expect_equal(f$k, 10)
   expect_equal(length(f$fold), 10)
   for (i in 1:10) {
-    expect_more_than(length(f$fold[[i]]), 7)
+    expect_gt(length(f$fold[[i]]), 7)
   }
 
   testFolds(f, mdata, "f Iterative kfold")
@@ -244,9 +244,9 @@ test_that("iterative kfold", {
   testFolds(f3, mdata, "f3 Iterative kfold")
   expect_equal(f3$k, 3)
   expect_equal(length(unlist(f3$fold)), 100)
-  expect_more_than(length(f3$fold[[1]]), 30)
-  expect_more_than(length(f3$fold[[2]]), 30)
-  expect_more_than(length(f3$fold[[3]]), 30)
+  expect_gt(length(f3$fold[[1]]), 30)
+  expect_gt(length(f3$fold[[2]]), 30)
+  expect_gt(length(f3$fold[[3]]), 30)
 
   ds <- create_holdout_partition(mdata, c("train" = 0.9, "test" = 0.1))
   f4 <- create_kfold_partition(ds$train, 9, "iterative")
@@ -274,11 +274,10 @@ test_that("subset and random subset", {
   data2 <- create_subset(mdata, rows, cols)
   expect_equal(data1, data2)
 
-  data <- create_subset(mdata, seq(200), seq(30))
-  expect_equal(data, mdata)
-
-  data <- create_subset(mdata, c(1,2,3,-5,-4,-10), c(1,2,3,-5,-4,-10))
+  expect_error(create_subset(mdata, c(1,2,3,-5,-4,-10), c(1,2,3,-5,-4,-10)))
   #TODO test values
+
+
 
   data <- create_random_subset(mdata, 20, 5)
   expect_equal(data$measures$num.instances, 20)

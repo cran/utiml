@@ -1,4 +1,4 @@
-# utiml: UTIlities for Multi-label Learning
+# utiml: Utilities for Multi-label Learning
 [![Travis-CI Build Status](https://travis-ci.org/rivolli/utiml.svg?branch=master)](https://travis-ci.org/rivolli/utiml)
 
 The utiml package is a framework to support multi-label processing, like Mulan 
@@ -22,6 +22,11 @@ To run the examples in this document, you also need to install the packages:
 ```r
 # Base classifiers (SVM and Random Forest)
 install.packages(c("e1071", "randomForest"))
+```
+
+## Install via github (development version)
+```r
+devtools::install_github("rivolli/utiml")
 ```
 
 # Multi-label Classification

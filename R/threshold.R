@@ -64,6 +64,52 @@ fixed_threshold.mlresult <- function (prediction, threshold = 0.5,
   fixed_threshold.default(as.probability(prediction), threshold, probability)
 }
 
+# CARDINALITY -----------------------------------------------------------------
+#' Threshold based on cardinality
+#'
+#' Find and apply the best threshold based on cardinality of training set.
+#' The threshold is choice based on how much the average observed label
+#' cardinality is close to the average predicted label cardinality.
+#'
+#' @family threshold
+#' @param prediction A matrix or mlresult.
+#' @param cardinality A real value of training dataset label cardinality, used
+#'  to define the threshold value.
+#' @param probability A logical value. If \code{TRUE} the predicted values are
+#'  the score between 0 and 1, otherwise the values are bipartition 0 or 1.
+#'  (Default: \code{FALSE})
+#' @return A mlresult object.
+#' @references
+#'  Read, J., Pfahringer, B., Holmes, G., & Frank, E. (2011). Classifier chains
+#'  for multi-label classification. Machine Learning, 85(3), 333-359.
+#' @export
+#'
+#' @examples
+#' prediction <- matrix(runif(16), ncol = 4)
+#' lcard_threshold(prediction, 2.1)
+lcard_threshold <- function (prediction, cardinality, probability = FALSE) {
+  UseMethod("lcard_threshold")
+}
+
+#' @describeIn lcard_threshold Cardinality Threshold for matrix or data.frame
+#' @export
+lcard_threshold.default <- function (prediction, cardinality,
+                                     probability = FALSE) {
+  thresholds <- sort(unique(c(prediction)))
+  best <- which.min(abs(cardinality - sapply(thresholds, function (ts) {
+    mean(rowSums(prediction >= ts))
+  })))
+
+  fixed_threshold.default(prediction, thresholds[best], probability)
+}
+
+#' @describeIn lcard_threshold Cardinality Threshold for mlresult
+#' @export
+lcard_threshold.mlresult <- function (prediction, cardinality,
+                                      probability = FALSE) {
+  lcard_threshold.default(as.probability(prediction), cardinality, probability)
+}
+
 # MCUT -------------------------------------------------------------------------
 #' Maximum Cut Thresholding (MCut)
 #'
@@ -383,9 +429,6 @@ scut_threshold.mlresult <- function (prediction, expected, loss.function = NA,
 #'  values.
 #' @param train_y A matrix/data.frame with all labels values of the training
 #'  dataset or a mldr train dataset.
-#' @param base.threshold A numeric value between 0 and 1 to use as base to
-#'  determine which values needs be reescaled to preserve the corrected
-#'  labelsets. If \code{NULL} the score correction is ignored. (Default: NULL)
 #' @param probability A logical value. If \code{TRUE} the predicted values are
 #'  the score between 0 and 1, otherwise the values are bipartition 0 or 1.
 #'  (Default: \code{FALSE})
@@ -405,8 +448,7 @@ scut_threshold.mlresult <- function (prediction, expected, loss.function = NA,
 #' @examples
 #' prediction <- predict(br(toyml, "RANDOM"), toyml)
 #' subset_correction(prediction, toyml)
-subset_correction <- function(mlresult, train_y, base.threshold = NULL,
-                              probability = FALSE) {
+subset_correction <- function(mlresult, train_y, probability = FALSE) {
   bip <- as.bipartition(mlresult)
   prob <- as.probability(mlresult)
 
@@ -427,34 +469,12 @@ subset_correction <- function(mlresult, train_y, base.threshold = NULL,
                       decreasing = TRUE))
   labelsets <- labelsets[order, ]
 
+  #TODO confirm the use of apply
   new.pred <- t(apply(bip, 1, function(y) {
     labelsets[names(which.min(apply(labelsets, 1, function(row) {
       sum(row != y)
     }))), ]
   }))
 
-  # Probabilities correction
-  new.prob <- prob
-  if (!is.null(base.threshold)) {
-    for (r in seq(nrow(prob))) {
-      row <- prob[r, ]
-
-      max_index <- new.pred[r, ] - row > base.threshold
-      min_index <- new.pred[r, ] - row <= -base.threshold
-
-      indexes <- min_index | max_index
-      max_v <- min(c(row[row > base.threshold & !indexes],
-                     base.threshold + 0.1))
-      min_v <- max(c(row[row < base.threshold & !indexes],
-                     base.threshold - 0.1))
-
-      # Normalize values
-      new.prob[r, max_index] =
-        row[max_index] * (max_v - base.threshold) + base.threshold
-      new.prob[r, min_index] =
-        row[min_index] * (base.threshold - min_v) + min_v
-    }
-  }
-
-  multilabel_prediction(new.pred, new.prob, probability)
+  multilabel_prediction(new.pred, prob, probability)
 }

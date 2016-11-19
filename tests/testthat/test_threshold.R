@@ -37,6 +37,36 @@ test_that("Fixed threshold", {
   expect_equal(newdata[, "lbl3"], c('11'=1, '12'=1, '13'=0, '14'=1, '15'=0))
 })
 
+test_that("Lcard threshold", {
+  # result
+  #    lbl1  lbl2  lbl3
+  # 11 0.68  0.18  0.94
+  # 12 0.03  0.01  0.34
+  # 13 0.79  0.80  0.31
+  # 14 0.20  0.80  0.68
+  # 15 0.81  0.24  0.35
+  crisp <- lcard_threshold(result, 1)
+  expect_is(crisp, "mlresult")
+  expect_true(is.bipartition(crisp))
+  expect_equal(crisp[, "lbl1"], c('11'=0, '12'=0, '13'=1, '14'=0, '15'=1))
+  expect_equal(crisp[, "lbl2"], c('11'=0, '12'=0, '13'=1, '14'=1, '15'=0))
+  expect_equal(crisp[, "lbl3"], c('11'=1, '12'=1, '13'=0, '14'=0, '15'=0))
+
+  crisp <- lcard_threshold(result, 2)
+  expect_is(crisp, "mlresult")
+  expect_true(is.bipartition(crisp))
+  expect_equal(crisp[, "lbl1"], c('11'=1, '12'=0, '13'=1, '14'=0, '15'=1))
+  expect_equal(crisp[, "lbl2"], c('11'=0, '12'=0, '13'=1, '14'=1, '15'=0))
+  expect_equal(crisp[, "lbl3"], c('11'=1, '12'=1, '13'=1, '14'=1, '15'=1))
+
+  crisp <- lcard_threshold(result, 3)
+  expect_is(crisp, "mlresult")
+  expect_true(is.bipartition(crisp))
+  expect_equal(crisp[, "lbl1"], c('11'=1, '12'=1, '13'=1, '14'=1, '15'=1))
+  expect_equal(crisp[, "lbl2"], c('11'=1, '12'=1, '13'=1, '14'=1, '15'=1))
+  expect_equal(crisp[, "lbl3"], c('11'=1, '12'=1, '13'=1, '14'=1, '15'=1))
+})
+
 test_that("MCut threshold", {
   crisp <- mcut_threshold(result)
   expect_is(crisp, "mlresult")
@@ -119,23 +149,14 @@ test_that("SCut threshold", {
   thresholds <- scut_threshold(result, classes)
   expect_equal(thresholds[1], thresholds2[1])
   expect_equal(thresholds[2], thresholds2[2])
-  expect_more_than(thresholds[3], max(result[, 3]))
+  expect_gt(thresholds[3], max(result[, 3]))
 
   expect_error(scut_threshold(result, mlresult, function (){}))
   expect_error(scut_threshold(result, mlresult, CORES = 0))
 })
 
 test_that("Subset correction", {
-  prediction <- subset_correction(mlresult, as.bipartition(mlresult),
-                                  base.threshold = 0.5)
+  prediction <- subset_correction(mlresult, as.bipartition(mlresult))
   expect_is(prediction, "mlresult")
-  scores <- as.probability(prediction)
-  expect_equal(scores[, 1], result[, 1])
-  expect_equal(scores[, 2], result[, 2])
-  expect_more_than(scores[2, 3], 0.5)
-  expect_more_than(scores[2, 3], result[2, 3])
-  expect_more_than(scores[2, 3], result[3, 3])
-  expect_more_than(scores[2, 3], result[5, 3])
-  expect_less_than(scores[2, 3], result[1, 3])
-  expect_less_than(scores[2, 3], result[4, 3])
+  expect_equal(as.probability(prediction), as.probability(mlresult))
 })

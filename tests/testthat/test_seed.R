@@ -174,3 +174,75 @@ test_that("RDBR Test", {
   testPredictMethod(method=rdbr, name=name)
   testSeedEffectMethod(method=rdbr, name=name)
 })
+
+test_that("LIFT", {
+  skip_on_cran()
+  name <- "LIFT"
+  testTrainMethod(method=lift, name=name)
+  testPredictMethod(method=lift, name=name)
+  testSeedEffectMethod(method=lift, name=name)
+})
+
+test_that("RPC", {
+  skip_on_cran()
+  name <- "RPC"
+  testTrainMethod(method=rpc, name=name)
+  testPredictMethod(method=rpc, name=name)
+  testSeedEffectMethod(method=rpc, name=name)
+})
+
+test_that("CLR", {
+  skip_on_cran()
+  name <- "CLR"
+  testTrainMethod(method=clr, name=name)
+  testPredictMethod(method=clr, name=name)
+  testSeedEffectMethod(method=clr, name=name)
+})
+
+test_that("LP", {
+  skip_on_cran()
+  name <- "LP"
+  testTrainMethod(method=lp, name=name)
+  testPredictMethod(method=lp, name=name)
+  testSeedEffectMethod(method=lp, name=name)
+})
+
+test_that("RAkEL", {
+  skip_on_cran()
+  name <- "RAkEL"
+  testTrainMethod(method=rakel, name=name)
+  testPredictMethod(method=rakel, name=name)
+  testSeedEffectMethod(method=rakel, name=name)
+})
+
+test_that("PPT", {
+  skip_on_cran()
+  name <- "PPT"
+  testTrainMethod(method=ppt, name=name)
+  testPredictMethod(method=ppt, name=name)
+  testSeedEffectMethod(method=ppt, name=name)
+})
+
+test_that("PS", {
+  skip_on_cran()
+  name <- "PS"
+  testTrainMethod(method=ps, name=name)
+  testPredictMethod(method=ps, name=name)
+  testSeedEffectMethod(method=ps, name=name)
+})
+
+test_that("EPS", {
+  skip_on_cran()
+  name <- "EPS"
+  testTrainMethod(method=eps, name=name)
+  testPredictMethod(method=eps, name=name)
+  testSeedEffectMethod(method=eps, name=name)
+})
+
+test_that("HOMER", {
+  skip_on_cran()
+  name <- "HOMER"
+  testTrainMethod(method=homer, name=name)
+  testPredictMethod(method=homer, name=name)
+  testSeedEffectMethod(method=homer, name=name)
+})

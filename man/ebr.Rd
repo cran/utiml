@@ -5,7 +5,7 @@
 \title{Ensemble of Binary Relevance for multi-label Classification}
 \usage{
 ebr(mdata, base.method = getOption("utiml.base.method", "SVM"), m = 10,
-  subsample = 0.75, attr.space = 0.5, ...,
+  subsample = 0.75, attr.space = 0.5, replacement = TRUE, ...,
   cores = getOption("utiml.cores", 1), seed = getOption("utiml.seed", NA))
 }
 \arguments{
@@ -14,13 +14,17 @@ ebr(mdata, base.method = getOption("utiml.base.method", "SVM"), m = 10,
 \item{base.method}{A string with the name of the base method. (Default:
 \code{options("utiml.base.method", "SVM")})}
 
-\item{m}{The number of Binary Relevance models used in the ensemble.}
+\item{m}{The number of Binary Relevance models used in the ensemble.
+(Default: 10)}
 
 \item{subsample}{A value between 0.1 and 1 to determine the percentage of
 training instances that must be used for each classifier. (Default: 0.75)}
 
 \item{attr.space}{A value between 0.1 and 1 to determine the percentage of
 attributes that must be used for each classifier. (Default: 0.50)}
+
+\item{replacement}{Bollean value to define if use sampling with replacement
+to create the data of the models of the ensemble. (Default: TRUE)}
 
 \item{...}{Others arguments passed to the base method for all subproblems}
 
@@ -77,12 +81,17 @@ Read, J., Pfahringer, B., Holmes, G., & Frank, E. (2011). Classifier
    5782, 254-269.
 }
 \seealso{
-Other Ensemble methods: \code{\link{ecc}}
+Other Ensemble methods: \code{\link{ecc}},
+  \code{\link{eps}}
 
 Other Transformation methods: \code{\link{brplus}},
-  \code{\link{br}}, \code{\link{cc}}, \code{\link{ctrl}},
-  \code{\link{dbr}}, \code{\link{ecc}}, \code{\link{mbr}},
-  \code{\link{ns}}, \code{\link{prudent}},
-  \code{\link{rdbr}}
+  \code{\link{br}}, \code{\link{cc}}, \code{\link{clr}},
+  \code{\link{ctrl}}, \code{\link{dbr}}, \code{\link{ecc}},
+  \code{\link{eps}}, \code{\link{homer}},
+  \code{\link{lift}}, \code{\link{lp}}, \code{\link{mbr}},
+  \code{\link{ns}}, \code{\link{ppt}},
+  \code{\link{prudent}}, \code{\link{ps}},
+  \code{\link{rakel}}, \code{\link{rdbr}},
+  \code{\link{rpc}}
 }
 

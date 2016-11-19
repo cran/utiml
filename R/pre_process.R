@@ -175,11 +175,7 @@ remove_unique_attributes <- function(mdata) {
 remove_unlabeled_instances <- function(mdata) {
   labelset <- rep(0, mdata$measures$num.labels)
   rows <- !apply(mdata$dataset[mdata$labels$index] == labelset, 1, all)
-  cols <- seq(mdata$measures$num.attributes)
-
-  mldr::mldr_from_dataframe(mdata$dataset[rows, cols],
-                            mdata$labels$index,
-                            name = mdata$name)
+  create_subset(mdata, rows)
 }
 
 #' Remove unusual or very common labels
@@ -231,30 +227,6 @@ remove_skewness_labels <- function(mdata, t = 1) {
 #' new.toy$dataset$ratt10 <- new.column
 #' head(replace_nominal_attributes(new.toy))
 replace_nominal_attributes <- function(mdata, ordinal.attributes = list()) {
-  # TODO ordinal.attributes
-  replace_nominal_column <- function(column, column.name = "", type = 1) {
-    column <- as.factor(column)
-    symbols <- levels(column)
-    result <- {}
-
-    if (length(symbols) == 2 && type == 1 && 0 %in% symbols && 1 %in% symbols) {
-      result <- cbind(result, as.double(column == 1))
-      names <- column.name
-    }
-    else {
-      for (i in seq(length(symbols) - type)) {
-        result <- cbind(result, as.double(column == symbols[i]))
-      }
-      names <- paste(column.name, symbols[seq(length(symbols) - type)], sep="_")
-    }
-
-    if (column.name != "") {
-      colnames(result) <- names
-    }
-
-    result
-  }
-
   dataset <- data.frame(row.names = rownames(mdata$dataset))
   labelIndexes <- c()
   for (col in seq(mdata$measures$num.attributes)) {
@@ -265,11 +237,51 @@ replace_nominal_attributes <- function(mdata, ordinal.attributes = list()) {
       }
     }
     else {
-      column <- replace_nominal_column(mdata$dataset[, col],
-                                       colnames(mdata$dataset[col]))
+      column <- rep_nom_col(mdata$dataset[, col], colnames(mdata$dataset[col]))
       dataset <- cbind(dataset, column)
     }
   }
 
   mldr::mldr_from_dataframe(dataset, labelIndexes, name = mdata$name)
 }
+
+rep_nom_col <- function (column, column.name = "", type = 1) {
+  # TODO ordinal.attributes
+  column <- as.factor(column)
+  symbols <- levels(column)
+  result <- {}
+
+  for (i in seq(length(symbols) - type)) {
+    result <- cbind(result, as.double(column == symbols[i]))
+  }
+  names <- paste(column.name, symbols[seq(length(symbols) - type)], sep="_")
+
+  if (column.name != "") {
+    colnames(result) <- names
+  }
+
+  result
+}
+
+rep_nom_attr <- function(sdata, include.last = TRUE) {
+  sdata <- as.data.frame(sdata)
+  dataset <- data.frame(row.names = rownames(sdata))
+  labelIndexes <- c()
+  cols <- seq(ifelse(include.last, ncol(sdata), ncol(sdata)-1))
+  for (col in cols) {
+    if (is.numeric(sdata[, col])) {
+      dataset <- cbind(dataset, sdata[col])
+    }
+    else {
+      column <- rep_nom_col(sdata[, col], colnames(sdata[col]))
+      dataset <- cbind(dataset, column)
+    }
+  }
+
+  if (!include.last) {
+    dataset <- cbind(dataset, sdata[ncol(sdata)])
+  }
+
+  dataset
+}
+
