@@ -4,7 +4,7 @@
 
 <head>
 
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 
@@ -12,7 +12,7 @@
 
 <meta name="author" content="Adriano Rivolli" />
 
-<meta name="date" content="2016-11-19" />
+<meta name="date" content="2017-04-05" />
 
 <title>utiml: Utilities for multi-label learning</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">utiml: Utilities for multi-label learning</h1>
 <h4 class="author"><em>Adriano Rivolli</em></h4>
-<h4 class="date"><em>2016-11-19</em></h4>
+<h4 class="date"><em>2017-04-05</em></h4>
 
 
 
@@ -103,7 +103,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mytoy &lt;-<span class="st"> </span><span class="kw">normalize_mldata</span>(toyml)</code></pre></div>
 <p>Next, we want to stratification the dataset in two partitions (train and test), containing 65% and 35% of instances respectively, then we can do:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ds &lt;-<span class="st"> </span><span class="kw">create_holdout_partition</span>(mytoy, <span class="kw">c</span>(<span class="dt">train=</span><span class="fl">0.65</span>, <span class="dt">test=</span><span class="fl">0.35</span>), <span class="st">&quot;iterative&quot;</span>)</code></pre></div>
-<p>Now, the <code>ds</code> object has two elements <code>ds$train</code> and <code>ds$test</code>, where the first will be used to create a model and the second to test the model. For example, using the <em>Binary Relevance</em> multi-label method with the base classifier <em>Random Forest</em><a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>, we can do:</p>
+<p>Now, the <code>ds</code> object has two elements <code>ds$train</code> and <code>ds$test</code>, where the first will be used to create a model and the second to test the model. For example, using the <em>Binary Relevance</em> multi-label method with the base algorithm <em>Random Forest</em><a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>, we can do:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">brmodel &lt;-<span class="st"> </span><span class="kw">br</span>(ds$train, <span class="st">&quot;RF&quot;</span>, <span class="dt">seed=</span><span class="dv">123</span>)
 prediction &lt;-<span class="st"> </span><span class="kw">predict</span>(brmodel, ds$test)</code></pre></div>
 <p>The <code>prediction</code> is an object of class <code>mlresult</code> that contains the probability (also called confidence or score) and the bipartitions values:</p>
@@ -206,10 +206,10 @@ result &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class=
 <div id="classification-methods" class="section level2">
 <h2>5. Classification Methods</h2>
 <p>The multi-label classification is a supervised learning task that seeks to learn and predict one or more labels together. This task can be grouped in: problem transformation and algorithm adaptation. Next, we provide more details about the methods and their specifities.</p>
-<div id="transformation-methods-and-base-learners" class="section level3">
-<h3>5.1 Transformation methods and Base Learners</h3>
-<p>The transformation methods require a base learner (binary or multi-class) and use their predictions to compose the multi-label result. In the <strong>utiml</strong> package there are some default base learners that are accepted, but if you need another you can easily developement your own<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a>.</p>
-<p>Each base learner requires a specific package, you need to install manually this packages, because they are not installed together with <strong>utiml</strong>. The follow base learners are supported:</p>
+<div id="transformation-methods-and-base-algorihtms" class="section level3">
+<h3>5.1 Transformation methods and Base Algorihtms</h3>
+<p>The transformation methods require a base algorithm (binary or multi-class) and use their predictions to compose the multi-label result. In the <strong>utiml</strong> package there are some default base algorithms that are accepted, but if you need another you can easily developement your own<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a>.</p>
+<p>Each base algorithm requires a specific package, you need to install manually this packages, because they are not installed together with <strong>utiml</strong>. The follow algorithm learners are supported:</p>
 <table>
 <thead>
 <tr class="header">
@@ -289,67 +289,67 @@ result &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class=
 <tr class="odd">
 <td align="left">br</td>
 <td align="left">Binary Relevance (BR)</td>
-<td align="left">one-agains-all</td>
+<td align="left">one-against-all</td>
 </tr>
 <tr class="even">
 <td align="left">brplus</td>
 <td align="left">BR+</td>
-<td align="left">one-agains-all; stacking</td>
+<td align="left">one-against-all; stacking</td>
 </tr>
 <tr class="odd">
 <td align="left">cc</td>
 <td align="left">Classifier Chains</td>
-<td align="left">one-agains-all; stacking</td>
+<td align="left">one-against-all; stacking</td>
 </tr>
 <tr class="even">
 <td align="left">ctrl</td>
 <td align="left">ConTRolled Label correlation exploitation (CTRL)</td>
-<td align="left">one-agains-all; binary-ensemble</td>
+<td align="left">one-against-all; binary-ensemble</td>
 </tr>
 <tr class="odd">
 <td align="left">dbr</td>
 <td align="left">Dependent Binary Relevance (DBR)</td>
-<td align="left">one-agains-all; stacking</td>
+<td align="left">one-against-all; stacking</td>
 </tr>
 <tr class="even">
 <td align="left">ebr</td>
 <td align="left">Ensemble of Binary Relevance (EBR)</td>
-<td align="left">one-agains-all; ensemble</td>
+<td align="left">one-against-all; ensemble</td>
 </tr>
 <tr class="odd">
 <td align="left">ecc</td>
 <td align="left">Ensemble of Classifier Chains (ECC)</td>
-<td align="left">one-agains-all; ensemble; stacking</td>
+<td align="left">one-against-all; ensemble; stacking</td>
 </tr>
 <tr class="even">
 <td align="left">mbr</td>
 <td align="left">Meta-Binary Relevance (MBR or 2BR)</td>
-<td align="left">one-agains-all; stacking</td>
+<td align="left">one-against-all; stacking</td>
 </tr>
 <tr class="odd">
 <td align="left">ns</td>
 <td align="left">Nested Stacking (NS)</td>
-<td align="left">one-agains-all; stacking</td>
+<td align="left">one-against-all; stacking</td>
 </tr>
 <tr class="even">
 <td align="left">prudent</td>
 <td align="left">Pruned and Confident Stacking Approach (Prudent)</td>
-<td align="left">one-agains-all; binary-ensemble; stacking</td>
+<td align="left">one-against-all; binary-ensemble; stacking</td>
 </tr>
 <tr class="odd">
 <td align="left">rdbr</td>
 <td align="left">Recursive Dependent Binary Relevance (RDBR)</td>
-<td align="left">one-agains-all; stacking</td>
+<td align="left">one-against-all; stacking</td>
 </tr>
 </tbody>
 </table>
-<p>The first and second parameters of each multi-label method is always the same: The multi-label dataset and the base classifier, respectively. However, they may have specific parameters, examples:</p>
+<p>The first and second parameters of each multi-label method is always the same: The multi-label dataset and the base algorithm, respectively. However, they may have specific parameters, examples:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Classifier chain with a specific chain</span>
 ccmodel &lt;-<span class="st"> </span><span class="kw">cc</span>(toyml, <span class="st">&quot;J48&quot;</span>, <span class="dt">chain =</span> <span class="kw">c</span>(<span class="st">&quot;y5&quot;</span>, <span class="st">&quot;y4&quot;</span>, <span class="st">&quot;y3&quot;</span>, <span class="st">&quot;y2&quot;</span>, <span class="st">&quot;y1&quot;</span>))
 
 <span class="co"># Ensemble with 5 models using 60% of sampling and 75% of attributes</span>
 ebrmodel &lt;-<span class="st"> </span><span class="kw">ebr</span>(toyml, <span class="st">&quot;C5.0&quot;</span>, <span class="dt">m =</span> <span class="dv">5</span>, <span class="dt">subsample=</span><span class="fl">0.6</span>, <span class="dt">attr =</span> <span class="fl">0.75</span>)</code></pre></div>
-<p>Beyond the parameters of each multi-label methods, you can define the parameters for the base method, like this:</p>
+<p>Beyond the parameters of each multi-label methods, you can define the parameters for the base algorithm, like this:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Specific parameters for SVM</span>
 brmodel &lt;-<span class="st"> </span><span class="kw">br</span>(toyml, <span class="st">&quot;SVM&quot;</span>, <span class="dt">gamma =</span> <span class="fl">0.1</span>, <span class="dt">scale=</span><span class="ot">FALSE</span>)
 
@@ -421,15 +421,15 @@ prediction &lt;-<span class="st"> </span><span class="kw">predict</span>(brmodel
 result &lt;-<span class="st"> </span><span class="kw">multilabel_evaluate</span>(toy$test, prediction)
 <span class="kw">print</span>(<span class="kw">round</span>(result, <span class="dv">3</span>))</code></pre></div>
 <pre><code>##                F1          accuracy average-precision          coverage 
-##             0.710             0.592             0.856             1.400 
+##             0.746             0.636             0.869             1.833 
 ##      hamming-loss         macro-AUC          macro-F1   macro-precision 
-##             0.200             0.450             0.311             0.275 
+##             0.200             0.628             0.350             0.312 
 ##      macro-recall       margin-loss         micro-AUC          micro-F1 
-##             0.360             0.767             0.808             0.717 
+##             0.400             0.833             0.802             0.754 
 ##   micro-precision      micro-recall         one-error         precision 
-##             0.691             0.745             0.200             0.717 
+##             0.780             0.730             0.167             0.783 
 ##      ranking-loss            recall   subset-accuracy 
-##             0.156             0.794             0.233</code></pre>
+##             0.158             0.772             0.233</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Build a confusion matrix</span>
 confmat &lt;-<span class="st"> </span><span class="kw">multilabel_confusion_matrix</span>(toy$test, prediction)
 result &lt;-<span class="st"> </span><span class="kw">multilabel_evaluate</span>(confmat)
@@ -439,31 +439,31 @@ result &lt;-<span class="st"> </span><span class="kw">multilabel_evaluate</span>
 ## Absolute Matrix:
 ## -------------------------------------
 ##              Expected_1 Expected_0 TOTAL
-## Prediction_1         38         17    55
-## Predicion_0          13         82    95
-## TOTAL                51         99   150
+## Prediction_1         46         13    59
+## Predicion_0          17         74    91
+## TOTAL                63         87   150
 ## 
 ## Proportinal Matrix:
 ## -------------------------------------
 ##              Expected_1 Expected_0 TOTAL
-## Prediction_1      0.253      0.113 0.367
-## Predicion_0       0.087      0.547 0.633
-## TOTAL             0.340      0.660 1.000
+## Prediction_1      0.307      0.087 0.393
+## Predicion_0       0.113      0.493 0.607
+## TOTAL             0.420      0.580 1.000
 ## 
 ## Label Matrix
 ## -------------------------------------
 ##    TP FP FN TN Correct Wrong  %TP  %FP  %FN  %TN %Correct %Wrong
-## y1  0  0  3 27      27     3 0.00 0.00 0.10 0.90     0.90   0.10
-## y2 22  8  0  0      22     8 0.73 0.27 0.00 0.00     0.73   0.27
-## y3  0  0  1 29      29     1 0.00 0.00 0.03 0.97     0.97   0.03
-## y4 16  9  4  1      17    13 0.53 0.30 0.13 0.03     0.57   0.43
-## y5  0  0  5 25      25     5 0.00 0.00 0.17 0.83     0.83   0.17
+## y1  0  0  7 23      23     7 0.00 0.00 0.23 0.77     0.77   0.23
+## y2 24  6  0  0      24     6 0.80 0.20 0.00 0.00     0.80   0.20
+## y3  0  0  7 23      23     7 0.00 0.00 0.23 0.77     0.77   0.23
+## y4 22  7  0  1      23     7 0.73 0.23 0.00 0.03     0.77   0.23
+## y5  0  0  3 27      27     3 0.00 0.00 0.10 0.90     0.90   0.10
 ##    MeanRanking MeanScore
-## y1         4.0      0.20
-## y2         1.2      0.80
-## y3         3.0      0.26
-## y4         1.8      0.65
-## y5         5.0      0.17</code></pre>
+## y1        4.60      0.14
+## y2        1.13      0.78
+## y3        4.07      0.17
+## y4        1.87      0.67
+## y5        3.33      0.22</code></pre>
 <p>The confusion matrix summarizes a lot of data, and can be merged. For example, using a k-fold experiment:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">kfcv &lt;-<span class="st"> </span><span class="kw">create_kfold_partition</span>(toyml, <span class="dt">k=</span><span class="dv">3</span>)
 confmats &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">1</span>:<span class="dv">3</span>, function (k) {
@@ -513,7 +513,7 @@ result &lt;-<span class="st"> </span><span class="kw">multilabel_evaluate</span>
 <li id="fn1"><p>You may also be interested in <a href="https://cran.r-project.org/web/packages/mldr.datasets/index.html">mldr.datasets</a><a href="#fnref1">↩</a></p></li>
 <li id="fn2"><p>Requires the <a href="https://cran.r-project.org/web/packages/randomForest/">randomForest</a> package.<a href="#fnref2">↩</a></p></li>
 <li id="fn3"><p>see the section <em>Create a new base Learner</em><a href="#fnref3">↩</a></p></li>
-<li id="fn4"><p>Base learner <code>J48</code> do not work very well with multicore<a href="#fnref4">↩</a></p></li>
+<li id="fn4"><p>Base algorithm <code>J48</code> do not work very well with multicore<a href="#fnref4">↩</a></p></li>
 </ol>
 </div>
 

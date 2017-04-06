@@ -1,5 +1,17 @@
 # Changelog
 
+## utiml 0.1.2
+
+### Major changes
+* change base.method parameter name for base.algorithm
+
+### Bug fixes
+* Bugfix in `homer` to deal with labels without intances and to predict instances 
+   based on the meta-label scores
+* Refactory of merge_mlconfmat
+* Ensure reproducibility in all cases
+
+
 ## utiml 0.1.1
 New multi-label transformation methods including pairwise and multiclass 
 approaches. Some fixes from previous version.
