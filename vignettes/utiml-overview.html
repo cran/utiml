@@ -12,7 +12,7 @@
 
 <meta name="author" content="Adriano Rivolli" />
 
-<meta name="date" content="2017-04-05" />
+<meta name="date" content="2017-07-31" />
 
 <title>utiml: Utilities for multi-label learning</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">utiml: Utilities for multi-label learning</h1>
 <h4 class="author"><em>Adriano Rivolli</em></h4>
-<h4 class="date"><em>2017-04-05</em></h4>
+<h4 class="date"><em>2017-07-31</em></h4>
 
 
 
@@ -421,15 +421,15 @@ prediction &lt;-<span class="st"> </span><span class="kw">predict</span>(brmodel
 result &lt;-<span class="st"> </span><span class="kw">multilabel_evaluate</span>(toy$test, prediction)
 <span class="kw">print</span>(<span class="kw">round</span>(result, <span class="dv">3</span>))</code></pre></div>
 <pre><code>##                F1          accuracy average-precision          coverage 
-##             0.746             0.636             0.869             1.833 
+##             0.673             0.553             0.816             2.333 
 ##      hamming-loss         macro-AUC          macro-F1   macro-precision 
-##             0.200             0.628             0.350             0.312 
+##             0.253             0.579             0.332             0.287 
 ##      macro-recall       margin-loss         micro-AUC          micro-F1 
-##             0.400             0.833             0.802             0.754 
+##             0.400             1.267             0.734             0.694 
 ##   micro-precision      micro-recall         one-error         precision 
-##             0.780             0.730             0.167             0.783 
+##             0.717             0.672             0.167             0.717 
 ##      ranking-loss            recall   subset-accuracy 
-##             0.158             0.772             0.233</code></pre>
+##             0.236             0.689             0.133</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Build a confusion matrix</span>
 confmat &lt;-<span class="st"> </span><span class="kw">multilabel_confusion_matrix</span>(toy$test, prediction)
 result &lt;-<span class="st"> </span><span class="kw">multilabel_evaluate</span>(confmat)
@@ -439,31 +439,31 @@ result &lt;-<span class="st"> </span><span class="kw">multilabel_evaluate</span>
 ## Absolute Matrix:
 ## -------------------------------------
 ##              Expected_1 Expected_0 TOTAL
-## Prediction_1         46         13    59
-## Predicion_0          17         74    91
-## TOTAL                63         87   150
+## Prediction_1         43         17    60
+## Predicion_0          21         69    90
+## TOTAL                64         86   150
 ## 
 ## Proportinal Matrix:
 ## -------------------------------------
 ##              Expected_1 Expected_0 TOTAL
-## Prediction_1      0.307      0.087 0.393
-## Predicion_0       0.113      0.493 0.607
-## TOTAL             0.420      0.580 1.000
+## Prediction_1      0.287      0.113   0.4
+## Predicion_0       0.140      0.460   0.6
+## TOTAL             0.427      0.573   1.0
 ## 
 ## Label Matrix
 ## -------------------------------------
 ##    TP FP FN TN Correct Wrong  %TP  %FP  %FN  %TN %Correct %Wrong
-## y1  0  0  7 23      23     7 0.00 0.00 0.23 0.77     0.77   0.23
-## y2 24  6  0  0      24     6 0.80 0.20 0.00 0.00     0.80   0.20
-## y3  0  0  7 23      23     7 0.00 0.00 0.23 0.77     0.77   0.23
-## y4 22  7  0  1      23     7 0.73 0.23 0.00 0.03     0.77   0.23
-## y5  0  0  3 27      27     3 0.00 0.00 0.10 0.90     0.90   0.10
+## y1  0  0  9 21      21     9 0.00 0.00 0.30 0.70     0.70   0.30
+## y2 25  5  0  0      25     5 0.83 0.17 0.00 0.00     0.83   0.17
+## y3  0  0  5 25      25     5 0.00 0.00 0.17 0.83     0.83   0.17
+## y4 18 12  0  0      18    12 0.60 0.40 0.00 0.00     0.60   0.40
+## y5  0  0  7 23      23     7 0.00 0.00 0.23 0.77     0.77   0.23
 ##    MeanRanking MeanScore
-## y1        4.60      0.14
-## y2        1.13      0.78
-## y3        4.07      0.17
-## y4        1.87      0.67
-## y5        3.33      0.22</code></pre>
+## y1        4.87      0.10
+## y2        1.47      0.77
+## y3        3.17      0.20
+## y4        1.53      0.77
+## y5        3.97      0.15</code></pre>
 <p>The confusion matrix summarizes a lot of data, and can be merged. For example, using a k-fold experiment:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">kfcv &lt;-<span class="st"> </span><span class="kw">create_kfold_partition</span>(toyml, <span class="dt">k=</span><span class="dv">3</span>)
 confmats &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">1</span>:<span class="dv">3</span>, function (k) {
@@ -524,7 +524,7 @@ result &lt;-<span class="st"> </span><span class="kw">multilabel_evaluate</span>
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>

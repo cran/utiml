@@ -138,9 +138,8 @@ multilabel_prediction <- function(bipartitions, probabilities,
                               getOption("utiml.empty.prediction", FALSE)) {
   if (!empty.prediction) {
     # At least one label is predict
-    for (row in seq(nrow(bipartitions))) {
-      bipartitions[row, probabilities[row, ] == max(probabilities[row, ])] <- 1
-    }
+    poslab <- apply(probabilities, 1, which.max)
+    bipartitions[cbind(seq_along(poslab),poslab)] <- 1
   }
 
   bipartitions <- as.matrix(bipartitions)
@@ -169,7 +168,7 @@ print.mlresult <- function(x, ...) {
 
 #' Filter a Multi-Label Result
 #'
-#' If column filter is performed, then the result will be a matrix. Otherwhise,
+#' If column filter is performed, then the result will be a matrix. Otherwise,
 #' the result will be a mlresult.
 #'
 #' @param mlresult A mlresult object
@@ -177,15 +176,15 @@ print.mlresult <- function(x, ...) {
 #' @param colFilter A list of columns to filter
 #' @param ... Extra parameters to be used as the filter
 #' @return mlresult or matrix. If column filter is performed, then the result
-#'  will be a matrix. Otherwhise, the result will be a mlresult.
+#'  will be a matrix. Otherwise, the result will be a mlresult.
 #' @export
 `[.mlresult` <- function (mlresult, rowFilter = T, colFilter, ...) {
   if (missing(colFilter)) {
     bipartition <- as.bipartition(mlresult)
     probability <- as.probability(mlresult)
 
-    multilabel_prediction(bipartition[rowFilter, ],
-                          probability[rowFilter, ],
+    multilabel_prediction(bipartition[rowFilter, , drop=FALSE],
+                          probability[rowFilter, , drop=FALSE],
                           is.probability(mlresult))
   } else {
     as.matrix(mlresult)[rowFilter, colFilter, ...]

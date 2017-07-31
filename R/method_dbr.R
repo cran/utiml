@@ -1,6 +1,6 @@
 #' Dependent Binary Relevance (DBR) for multi-label Classification
 #'
-#' Create a DBR classifier to predic multi-label data. This is a simple approach
+#' Create a DBR classifier to predict multi-label data. This is a simple approach
 #' that enables the binary classifiers to discover existing label dependency by
 #' themselves. The idea of DBR is exactly the same used in BR+ (the training
 #' method is the same, excepted by the argument \code{estimate.models} that
@@ -10,8 +10,8 @@
 #' @param mdata A mldr dataset used to train the binary models.
 #' @param base.algorithm A string with the name of the base algorithm. (Default:
 #'  \code{options("utiml.base.algorithm", "SVM")})
-#' @param estimate.models Logical value indicatind whether is necessary build
-#'  Binary Relevance classifier for estimate process. The default implementaion
+#' @param estimate.models Logical value indicating whether is necessary build
+#'  Binary Relevance classifier for estimate process. The default implementation
 #'  use BR as estimators, however when other classifier is desirable then use
 #'  the value \code{FALSE} to skip this process. (Default: \code{TRUE}).
 #' @param ... Others arguments passed to the base algorithm for all subproblems.

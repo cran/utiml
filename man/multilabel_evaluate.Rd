@@ -8,9 +8,11 @@
 \usage{
 multilabel_evaluate(object, ...)
 
-\method{multilabel_evaluate}{mldr}(object, mlresult, measures = c("all"), ...)
+\method{multilabel_evaluate}{mldr}(object, mlresult, measures = c("all"),
+  labels = FALSE, ...)
 
-\method{multilabel_evaluate}{mlconfmat}(object, measures = c("all"), ...)
+\method{multilabel_evaluate}{mlconfmat}(object, measures = c("all"),
+  labels = FALSE, ...)
 }
 \arguments{
 \item{object}{A mldr dataset or a mlconfmat confusion matrix}
@@ -25,14 +27,18 @@ mldr is used).}
 use \code{"bipartition"}, \code{"ranking"}, \code{"label-based"},
 \code{"example-based"}, \code{"macro-based"} and \code{"micro-based"} to
 include a set of measures. (Default: "all").}
+
+\item{labels}{Logical value defining if the label results should be also
+returned. (Default: \code{FALSE})}
 }
 \value{
-a vector with the expected measures
+If labels is FALSE return a vector with the expected multi-label
+ measures, otherwise, a list contained the multi-label and label measures.
 }
 \description{
 This method is used to evaluate multi-label predictions. You can create a
 confusion matrix object or use directly the test dataset and the predictions.
-You can also especify whiches measures do you desire use.
+You can also specify which measures do you desire use.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -47,6 +53,7 @@ prediction <- predict(br(toyml), toyml)
 
 # Compute all measures
 multilabel_evaluate(toyml, prediction)
+multilabel_evaluate(toyml, prediction, labels=TRUE) # Return a list
 
 # Compute bipartition measures
 multilabel_evaluate(toyml, prediction, "bipartition")

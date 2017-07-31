@@ -1,6 +1,6 @@
 #' BR+ or BRplus for multi-label Classification
 #'
-#' Create a BR+ classifier to predic multi-label data. This is a simple approach
+#' Create a BR+ classifier to predict multi-label data. This is a simple approach
 #' that enables the binary classifiers to discover existing label dependency by
 #' themselves. The main idea of BR+ is to increment the feature space of the
 #' binary classifiers to let them discover existing label dependency by
@@ -66,6 +66,9 @@ brplus <- function(mdata,
   brpmodel$initial <- br(mdata, base.algorithm, ..., cores = cores, seed = seed)
 
   labeldata <- as.data.frame(mdata$dataset[mdata$labels$index])
+  for (i in seq(ncol(labeldata))) {
+    labeldata[, i] <- factor(labeldata[, i], levels=c(0, 1))
+  }
   labels <- utiml_rename(seq(mdata$measures$num.labels), brpmodel$labels)
   brpmodel$models <- utiml_lapply(labels, function(li) {
     basedata <- utiml_create_binary_data(mdata, brpmodel$labels[li],
@@ -84,7 +87,7 @@ brplus <- function(mdata,
 #'
 #' This function predicts values based upon a model trained by \code{brplus}.
 #'
-#' The strategies of estimate the values of the new features are separeted in
+#' The strategies of estimate the values of the new features are separated in
 #' two groups:
 #' \describe{
 #'  \item{No Update (\code{NU})}{This use the initial prediction of BR to all
@@ -183,10 +186,11 @@ predict.BRPmodel <- function(object, newdata,
   newdata <- utiml_newdata(newdata)
   initial.preds <- predict.BRmodel(object$initial, newdata, probability=FALSE,
                                    ..., cores=cores, seed=seed)
-  labeldata <- as.bipartition(initial.preds)
+  labeldata <- as.data.frame(as.bipartition(initial.preds))
   for (i in seq(ncol(labeldata))) {
     labeldata[, i] <- factor(labeldata[, i], levels=c(0, 1))
   }
+
   if (strategy == "NU") {
     indices <- utiml_rename(seq_along(labels), labels)
     predictions <- utiml_lapply(indices, function(li) {
