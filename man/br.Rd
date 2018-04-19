@@ -15,8 +15,7 @@ br(mdata, base.algorithm = getOption("utiml.base.algorithm", "SVM"), ...,
 
 \item{...}{Others arguments passed to the base algorithm for all subproblems}
 
-\item{cores}{The number of cores to parallelize the training. Values higher
-than 1 require the \pkg{parallel} package. (Default:
+\item{cores}{The number of cores to parallelize the training. (Default:
 \code{options("utiml.cores", 1)})}
 
 \item{seed}{An optional integer used to set the seed. This is useful when
@@ -62,10 +61,10 @@ Boutell, M. R., Luo, J., Shen, X., & Brown, C. M. (2004). Learning
 Other Transformation methods: \code{\link{brplus}},
   \code{\link{cc}}, \code{\link{clr}}, \code{\link{ctrl}},
   \code{\link{dbr}}, \code{\link{ebr}}, \code{\link{ecc}},
-  \code{\link{eps}}, \code{\link{homer}},
-  \code{\link{lift}}, \code{\link{lp}}, \code{\link{mbr}},
-  \code{\link{ns}}, \code{\link{ppt}},
-  \code{\link{prudent}}, \code{\link{ps}},
-  \code{\link{rakel}}, \code{\link{rdbr}},
-  \code{\link{rpc}}
+  \code{\link{eps}}, \code{\link{esl}},
+  \code{\link{homer}}, \code{\link{lift}},
+  \code{\link{lp}}, \code{\link{mbr}}, \code{\link{ns}},
+  \code{\link{ppt}}, \code{\link{prudent}},
+  \code{\link{ps}}, \code{\link{rakel}},
+  \code{\link{rdbr}}, \code{\link{rpc}}
 }

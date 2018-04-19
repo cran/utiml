@@ -1,5 +1,23 @@
 # Changelog
 
+## utiml 0.1.4
+
+### New Features
+* MLKNN algorithm
+* ranking-loss baseline
+* label problem evaluation measures
+* kfold bult-in method
+* The foodtruck dataset
+* ESL algorithm
+
+### Minor changes
+* confusion matrix in matrix format 
+
+### Bug fixes
+* Stratification sampling to support instances without labels
+* Fixed threshold with multiple values
+* Update documentation
+
 ## utiml 0.1.3
 ### Major changes
 * Change `multilabel_evaluation` to also return the label measures

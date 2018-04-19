@@ -1,6 +1,59 @@
 ## ------------------------------------------------------------------------
 library("utiml")
 
+## ------------------------------------------------------------------------
+head(toyml)
+
+## ------------------------------------------------------------------------
+foodtruck$labels
+
+## ------------------------------------------------------------------------
+mytoy <- normalize_mldata(toyml)
+
+## ------------------------------------------------------------------------
+ds <- create_holdout_partition(mytoy, c(train=0.65, test=0.35), "iterative")
+names(ds)
+
+## ------------------------------------------------------------------------
+brmodel <- br(ds$train, "RF", seed=123)
+prediction <- predict(brmodel, ds$test)
+
+## ------------------------------------------------------------------------
+head(as.bipartition(prediction))
+head(as.probability(prediction))
+head(as.ranking(prediction))
+
+## ------------------------------------------------------------------------
+newpred <- rcut_threshold(prediction, 2)
+head(newpred)
+
+## ------------------------------------------------------------------------
+result <- multilabel_evaluate(ds$tes, prediction, "bipartition")
+thresres <- multilabel_evaluate(ds$tes, newpred, "bipartition")
+
+round(cbind(Default=result, RCUT=thresres), 3)
+
+## ------------------------------------------------------------------------
+result <- multilabel_evaluate(ds$tes, prediction, "bipartition", labels=TRUE)
+result$labels
+
+## ------------------------------------------------------------------------
+results <- cv(foodtruck, br, base.algorith="SVM", cv.folds=5, 
+              cv.sampling="stratified", cv.measures="example-based", 
+              cv.seed=123)
+
+round(results, 4)
+
+## ------------------------------------------------------------------------
+results <- cv(toyml, "rakel", base.algorith="RF", cv.folds=10, cv.results=TRUE,
+              cv.sampling="random", cv.measures="example-based")
+
+#Multi-label results
+round(results$multilabel, 4)
+
+#Labels results
+round(sapply(results$labels, colMeans), 4)
+
 ## ---- echo=FALSE, results='asis'-----------------------------------------
 bl <- data.frame(
   Use = c("CART", "C5.0", "J48", "KNN", "MAJORITY", "NB", "RANDOM", "RF", "SVM"),
@@ -11,12 +64,13 @@ bl <- data.frame(
 knitr::kable(bl)
 
 ## ---- echo=FALSE, results='asis'-----------------------------------------
+approaches <- c(
+  "br"="one-against-all", "brplus"="one-against-all; stacking", "cc"="one-against-all; chaining", "clr"="one-versus-one", "ctrl"="one-against-all; ensemble", "dbr"="one-against-all; stacking", "ebr"="one-against-all; ensemble", "ecc"="one-against-all; ensemble", "eps"="powerset", "homer"="hierarchy", "lift"="one-against-all", "lp"="powerset", "mbr"="one-against-all; stacking", "ns"="one-against-all; chaining", "ppt"="powerset", "prudent"="one-against-all; stacking", "ps"="powerset", "rakel"="powerset", "rdbr"="one-against-all; stacking", "rpc"="one-versus-one"
+)
 mts <- data.frame(
-  Method = c("br", "brplus", "cc", "ctrl", "dbr", "ebr", "ecc", "mbr", "ns", "prudent", "rdbr"),
-  Name = c("Binary Relevance (BR)", "BR+", "Classifier Chains", "ConTRolled Label correlation exploitation (CTRL)",
-           "Dependent Binary Relevance (DBR)", "Ensemble of Binary Relevance (EBR)", "Ensemble of Classifier Chains (ECC)", "Meta-Binary Relevance (MBR or 2BR)", "Nested Stacking (NS)", "Pruned and Confident Stacking Approach (Prudent)", "Recursive Dependent Binary Relevance (RDBR)"),
-  Approach = c("one-against-all", "one-against-all; stacking", "one-against-all; stacking", "one-against-all; binary-ensemble", "one-against-all; stacking", "one-against-all; ensemble", "one-against-all; ensemble; stacking",
-"one-against-all; stacking", "one-against-all; stacking", "one-against-all; binary-ensemble; stacking", "one-against-all; stacking")
+  Method = c("br", "brplus", "cc", "clr", "ctrl", "dbr", "ebr", "ecc", "eps", "homer", "lift", "lp", "mbr", "ns", "ppt", "prudent", "ps", "rakel", "rdbr", "rpc"),
+  Name = c("Binary Relevance (BR)", "BR+", "Classifier Chains", "Calibrated Label Ranking (CLR)", "ConTRolled Label correlation exploitation (CTRL)", "Dependent Binary Relevance (DBR)", "Ensemble of Binary Relevance (EBR)", "Ensemble of Classifier Chains (ECC)", "Ensemble of Pruned Set (EPS)", "Hierarchy Of Multi-label classifiER (HOMER)", "Learning with Label specIfic FeaTures (LIFT)", "Label Powerset (LP)", "Meta-Binary Relevance (MBR or 2BR)", "Nested Stacking (NS)", "Pruned Problem Transformation (PPT)", "Pruned and Confident Stacking Approach (Prudent)", "Pruned Set (PS)", "Random k-labelsets (RAkEL)", "Recursive Dependent Binary Relevance (RDBR)", "Ranking by Pairwise Comparison (RPC)"),
+  Approach = as.character(approaches)
 )
 knitr::kable(mts)
 
