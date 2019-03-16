@@ -1,8 +1,8 @@
 Package: utiml
 Type: Package
 Title: Utilities for Multi-Label Learning
-Version: 0.1.4
-Date: 2018-04-16
+Version: 0.1.5
+Date: 2019-03-15
 Authors@R: person("Adriano", "Rivolli", email = "rivolli@utfpr.edu.br",
                   role = c("aut", "cre"))
 Description: Multi-label learning strategies and others procedures to support multi-
@@ -10,9 +10,9 @@ Description: Multi-label learning strategies and others procedures to support mu
   sampling methods, transformation strategies, threshold functions, pre-processing 
   techniques and evaluation metrics. A complete overview of the matter can be seen in
   Zhang, M. and Zhou, Z. (2014) <doi:10.1109/TKDE.2013.39> and Gibaja, E. and 
-  Ventura, S. (2015) <doi:10.1145/2716262>.
+  Ventura, S. (2015) A Tutorial on Multi-label Learning.
 URL: https://github.com/rivolli/utiml
-Depends: R (>= 3.0.0), mldr(>= 0.4.0), parallel
+Depends: R (>= 3.0.0), mldr(>= 0.4.0), parallel, ROCR
 Imports: stats, utils
 Suggests: C50, e1071, FSelector, infotheo, kknn, knitr, randomForest,
         rJava(>= 0.9), rmarkdown, rpart, RWeka(>= 0.4), testthat,
@@ -20,11 +20,12 @@ Suggests: C50, e1071, FSelector, infotheo, kknn, knitr, randomForest,
 License: GPL | file LICENSE
 LazyData: true
 BugReports: https://github.com/rivolli/utiml
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 VignetteBuilder: knitr
+Encoding: UTF-8
 NeedsCompilation: no
-Packaged: 2018-04-19 20:39:16 UTC; rivolli
+Packaged: 2019-03-15 22:53:31 UTC; rivolli
 Author: Adriano Rivolli [aut, cre]
 Maintainer: Adriano Rivolli <rivolli@utfpr.edu.br>
 Repository: CRAN
-Date/Publication: 2018-04-20 00:02:05 UTC
+Date/Publication: 2019-03-16 05:40:03 UTC
