@@ -42,9 +42,9 @@
 #' model <- eps(toyml, "RANDOM")
 #' pred <- predict(model, toyml)
 #'
-#' \dontrun{
+#' \donttest{
 #' ##Change default configurations
-#' model <- eps(toyml, "RF", m=15, subsample=0.4, p=4, strategy="B", b=4)
+#' model <- eps(toyml, "RF", m=15, subsample=0.4, p=4, strategy="B", b=1)
 #' }
 eps <- function (mdata,
                  base.algorithm = getOption("utiml.base.algorithm", "SVM"),
@@ -79,7 +79,6 @@ eps <- function (mdata,
                    nrow = ceiling(mdata$measures$num.instances * subsample),
                    call = match.call())
 
-  utiml_preserve_seed()
   if (!anyNA(seed)) {
     set.seed(seed)
   }
@@ -92,7 +91,6 @@ eps <- function (mdata,
        strategy = strategy, b = b, ..., seed = seed)
   }, cores, seed)
 
-  utiml_restore_seed()
   class(epsmodel) <- "EPSmodel"
   epsmodel
 }
@@ -137,14 +135,12 @@ predict.EPSmodel <- function(object, newdata, threshold = 0.5,
   options(utiml.empty.prediction = TRUE)
 
   newdata <- utiml_newdata(newdata)
-  utiml_preserve_seed()
 
   results <- utiml_lapply(object$models, function (psmodel){
     res <- predict.PSmodel(psmodel, newdata)
     as.probability(res) * as.bipartition(res)
   }, cores, seed)
 
-  utiml_restore_seed()
   options(utiml.empty.prediction = previous.value)
 
   as.mlresult(Reduce('+', results), probability = probability,
@@ -154,6 +150,9 @@ predict.EPSmodel <- function(object, newdata, threshold = 0.5,
 #' Print EPS model
 #' @param x The ps model
 #' @param ... ignored
+#'
+#' @return No return value, called for print model's detail
+#'
 #' @export
 print.EPSmodel <- function(x, ...) {
   cat("Ensemble of Pruned Set Model\n\nCall:\n")

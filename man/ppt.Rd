@@ -53,13 +53,16 @@ remove the less common classes to predict multi-label data.
 model <- ppt(toyml, "RANDOM")
 pred <- predict(model, toyml)
 
-\dontrun{
+\donttest{
 ##Change default configurations
 model <- ppt(toyml, "RF", p=4, info.loss=TRUE)
 }
 }
 \references{
-Read, J. (2008). A pruned problem transformation method for multi-label
+Read, J., Pfahringer, B., & Holmes, G. (2008). Multi-label classification
+  using ensembles of pruned sets. In Proceedings - IEEE International
+  Conference on Data Mining, ICDM (pp. 995–1000).
+ Read, J. (2008). A pruned problem transformation method for multi-label
   classification. In Proceedings of the New Zealand Computer Science
   Research Student Conference (pp. 143-150).
 }
@@ -69,7 +72,6 @@ Other Transformation methods:
 \code{\link{br}()},
 \code{\link{cc}()},
 \code{\link{clr}()},
-\code{\link{ctrl}()},
 \code{\link{dbr}()},
 \code{\link{ebr}()},
 \code{\link{ecc}()},

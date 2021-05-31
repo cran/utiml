@@ -59,9 +59,9 @@ specific phi value is added.
 model <- prudent(toyml, "RANDOM")
 pred <- predict(model, toyml)
 
-\dontrun{
-# Use different phi correlation with J48 classifier
-model <- prudent(toyml, 'J48', 0.3)
+\donttest{
+# Use different phi correlation with C5.0 classifier
+model <- prudent(toyml, 'C5.0', 0.3)
 
 # Set a specific parameter
 model <- prudent(toyml, 'KNN', k=5)
@@ -78,7 +78,6 @@ Other Transformation methods:
 \code{\link{br}()},
 \code{\link{cc}()},
 \code{\link{clr}()},
-\code{\link{ctrl}()},
 \code{\link{dbr}()},
 \code{\link{ebr}()},
 \code{\link{ecc}()},

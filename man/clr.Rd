@@ -47,9 +47,6 @@ separates the relevant from the irrelevant labels.
 \examples{
 model <- clr(toyml, "RANDOM")
 pred <- predict(model, toyml)
-
-\dontrun{
-}
 }
 \references{
 Brinker, K., Furnkranz, J., & Hullermeier, E. (2006). A unified model for
@@ -64,7 +61,6 @@ Other Transformation methods:
 \code{\link{brplus}()},
 \code{\link{br}()},
 \code{\link{cc}()},
-\code{\link{ctrl}()},
 \code{\link{dbr}()},
 \code{\link{ebr}()},
 \code{\link{ecc}()},

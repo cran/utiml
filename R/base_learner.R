@@ -56,7 +56,7 @@
 #' # Using this base method with Binary Relevance
 #' brmodel <- br(toyml, 'FOO')
 #'
-#' \dontrun{
+#' \donttest{
 #'
 #' # Create a SVM method using the e1071 package
 #' library(e1071)
@@ -120,7 +120,7 @@ mltrain <- function(object, ...) {
 #'    )
 #' }
 #'
-#' \dontrun{
+#' \donttest{
 #' # Create a SVM predict method using the e1071 package (the class of SVM model
 #' # from e1071 package is 'svm')
 #' library(e1071)
@@ -176,73 +176,6 @@ mlpredict.svm <- function(model, newdata, ...) {
   data.frame(
     prediction = prediction,
     probability = all.prob[cbind(rownames(newdata), prediction)],
-    row.names = rownames(newdata)
-  )
-}
-
-# SMO METHOD -------------------------------------------------------------
-# @describeIn mltrain SMO implementation (require \pkg{RWeka} package to use)
-mltrain.baseSMO <- function(object, ...) {
-  if (requireNamespace("RWeka", quietly = TRUE) &&
-      requireNamespace("rJava", quietly = TRUE)) {
-    formula <- stats::as.formula(paste("`", object$labelname, "` ~ .", sep=""))
-    model <- RWeka::SMO(formula, object$data, ...)
-    rJava::.jcache(model$classifier)
-  }
-  else {
-    stop(paste("There are no installed package 'RWeka' and 'rJava' to use SMO",
-               "classifier as base method"))
-  }
-  model
-}
-
-# @describeIn mlpredict SMO implementation (require \pkg{RWeka} package to use)
-mlpredict.SMO <- function(model, newdata, ...) {
-  if (!requireNamespace("RWeka", quietly = TRUE)) {
-    stop(paste("There are no installed package 'RWeka' to use SMO classifier",
-               "as base method"))
-  }
-
-  result <- stats::predict(model, newdata, type = "probability", ...)
-  prediction <- colnames(result)[apply(result, 1, which.max)]
-  data.frame(
-    prediction = prediction,
-    probability = result[cbind(rownames(newdata), prediction)],
-    row.names = rownames(newdata)
-  )
-}
-
-# J48 METHOD -------------------------------------------------------------
-# @describeIn mltrain J48 implementation (require \pkg{RWeka} package to use)
-mltrain.baseJ48 <- function(object, ...) {
-  #http://r.789695.n4.nabble.com/How-to-save-load-RWeka-models-into-from-a-file-td870876.html
-  #https://github.com/s-u/rJava/issues/25
-  #inspect the JVM log error file in the second execution
-  if (requireNamespace("RWeka", quietly = TRUE) &&
-      requireNamespace("rJava", quietly = TRUE)) {
-    formula <- stats::as.formula(paste("`", object$labelname, "` ~ .", sep=""))
-    model <- RWeka::J48(formula, object$data, ...)
-    rJava::.jcache(model$classifier)
-  }
-  else {
-    stop(paste("There are no installed package 'RWeka' and 'rJava' to use J48",
-               "classifier as base method"))
-  }
-  model
-}
-
-# @describeIn mlpredict J48 implementation (require \pkg{RWeka} package to use)
-mlpredict.J48 <- function(model, newdata, ...) {
-  if (!requireNamespace("RWeka", quietly = TRUE)) {
-    stop(paste("There are no installed package 'RWeka' to use J48 classifier",
-               "as base method"))
-  }
-
-  result <- stats::predict(model, newdata, type = "probability", ...)
-  prediction <- colnames(result)[apply(result, 1, which.max)]
-  data.frame(
-    prediction = prediction,
-    probability = result[cbind(rownames(newdata), prediction)],
     row.names = rownames(newdata)
   )
 }
@@ -433,7 +366,6 @@ mltrain.baseXGB <- function(object, ...) {
     nthread = 1,
     nrounds = 3,
     verbose = FALSE,
-    silent = 1,
     objective = ifelse(nlevels(object$data[, object$labelindex]) == 2,
                        "binary:logistic", "multi:softprob")
   )
@@ -530,6 +462,9 @@ mlpredict.emptyModel <- function (model, newdata, ...) {
 #' Print Majority model
 #' @param x The base model
 #' @param ... ignored
+#'
+#' @return No return value, called for print model's detail
+#'
 #' @export
 print.majorityModel <- function (x, ...) {
   cat("Majority Base Model\n\n")
@@ -541,6 +476,9 @@ print.majorityModel <- function (x, ...) {
 #' Print Random model
 #' @param x The base model
 #' @param ... ignored
+#'
+#' @return No return value, called for print model's detail
+#'
 #' @export
 print.randomModel <- function (x, ...) {
   cat("Random Base Model\n\n")

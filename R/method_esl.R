@@ -32,13 +32,13 @@
 #' model <- esl(toyml, "RANDOM")
 #' pred <- predict(model, toyml)
 #'
-#' \dontrun{
+#' \donttest{
 #' # Use SVM as base algorithm
 #' model <- esl(toyml, "SVM")
 #' pred <- predict(model, toyml)
 #'
-#' # Change the base algorithm and use 4 CORES
-#' model <- esl(toyml[1:50], 'RF', cores = 4, seed = 123)
+#' # Change the base algorithm and use 2 CORES
+#' model <- esl(toyml[1:50], 'RF', cores = 2, seed = 123)
 #'
 #' # Set a parameters for all subproblems
 #' model <- esl(toyml, 'KNN', k=5)
@@ -55,8 +55,6 @@ esl <- function(mdata,
   if (cores < 1) {
     stop("Cores must be a positive value")
   }
-
-  utiml_preserve_seed()
 
   freqs <- mdata$labels$freq
   labels <- rownames(mdata$labels)
@@ -78,7 +76,6 @@ esl <- function(mdata,
       ...
     )
   }, cores, seed)
-  utiml_restore_seed()
 
   class(eslmodel) <- "ESLmodel"
   eslmodel
@@ -118,7 +115,6 @@ predict.ESLmodel <- function(object, newdata,
   }
 
   newdata <- utiml_newdata(newdata)
-  utiml_preserve_seed()
 
   labels <- object$labels
 
@@ -145,6 +141,9 @@ predict.ESLmodel <- function(object, newdata,
 #' Print ESL model
 #' @param x The esl model
 #' @param ... ignored
+#'
+#' @return No return value, called for print model's detail
+#'
 #' @export
 print.ESLmodel <- function(x, ...) {
   cat("Ensemble of Single Label Model\n\nCall:\n")

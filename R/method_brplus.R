@@ -39,9 +39,9 @@
 #' model <- brplus(toyml, "RANDOM")
 #' pred <- predict(model, toyml)
 #'
-#' \dontrun{
-#' # Use Random Forest as base algorithm and 4 cores
-#' model <- brplus(toyml, 'RF', cores = 4, seed = 123)
+#' \donttest{
+#' # Use Random Forest as base algorithm and 2 cores
+#' model <- brplus(toyml, 'RF', cores = 2, seed = 123)
 #' }
 brplus <- function(mdata,
                    base.algorithm = getOption("utiml.base.algorithm", "SVM"),
@@ -54,8 +54,6 @@ brplus <- function(mdata,
   if (cores < 1) {
     stop("Cores must be a positive value")
   }
-
-  utiml_preserve_seed()
 
   # BRplus Model class
   brpmodel <- list(labels = rownames(mdata$labels), call = match.call())
@@ -78,7 +76,6 @@ brplus <- function(mdata,
     utiml_create_model(dataset, ...)
   }, cores, seed)
 
-  utiml_restore_seed()
   class(brpmodel) <- "BRPmodel"
   brpmodel
 }
@@ -143,12 +140,12 @@ brplus <- function(mdata,
 #' model <- brplus(toyml, "RANDOM")
 #' pred <- predict(model, toyml)
 #'
-#' \dontrun{
+#' \donttest{
 #' # Predict SVM bipartitions and change the method to use No Update strategy
 #' pred <- predict(model, toyml, strategy = 'NU', probability = FALSE)
 #'
 #' # Predict using a random sequence to update the labels
-#' labels <- sample(rownames(dataset$train$labels))
+#' labels <- sample(rownames(toyml$labels))
 #' pred <- predict(model, toyml, strategy = 'Ord', order = labels)
 #'
 #' # Passing a specif parameter for SVM predict method
@@ -178,7 +175,6 @@ predict.BRPmodel <- function(object, newdata,
     stop("Cores must be a positive value")
   }
 
-  utiml_preserve_seed()
   if (!anyNA(seed)) {
     set.seed(seed)
   }
@@ -217,13 +213,15 @@ predict.BRPmodel <- function(object, newdata,
     }
   }
 
-  utiml_restore_seed()
   utiml_predict(predictions[labels], probability)
 }
 
 #' Print BRP model
 #' @param x The brp model
 #' @param ... ignored
+#'
+#' @return No return value, called for print model's detail
+#'
 #' @export
 print.BRPmodel <- function(x, ...) {
   cat("Classifier BRplus (also called BR+)\n\nCall:\n")

@@ -55,15 +55,15 @@ classes to predict multi-label data.
 model <- ps(toyml, "RANDOM")
 pred <- predict(model, toyml)
 
-\dontrun{
+\donttest{
 ##Change default configurations
-model <- ps(toyml, "RF", p=4, strategy="B", b=4)
+model <- ps(toyml, "RF", p=4, strategy="B", b=1)
 }
 }
 \references{
-Read, J. (2008). A pruned problem transformation method for multi-label
- classification. In Proceedings of the New Zealand Computer Science Research
- Student Conference (pp. 143-150).
+Read, J., Pfahringer, B., & Holmes, G. (2008). Multi-label classification
+  using ensembles of pruned sets. In Proceedings - IEEE International
+  Conference on Data Mining, ICDM (pp. 995–1000).
 }
 \seealso{
 Other Transformation methods: 
@@ -71,7 +71,6 @@ Other Transformation methods:
 \code{\link{br}()},
 \code{\link{cc}()},
 \code{\link{clr}()},
-\code{\link{ctrl}()},
 \code{\link{dbr}()},
 \code{\link{ebr}()},
 \code{\link{ecc}()},

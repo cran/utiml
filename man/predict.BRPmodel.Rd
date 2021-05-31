@@ -79,12 +79,12 @@ two groups:
 model <- brplus(toyml, "RANDOM")
 pred <- predict(model, toyml)
 
-\dontrun{
+\donttest{
 # Predict SVM bipartitions and change the method to use No Update strategy
 pred <- predict(model, toyml, strategy = 'NU', probability = FALSE)
 
 # Predict using a random sequence to update the labels
-labels <- sample(rownames(dataset$train$labels))
+labels <- sample(rownames(toyml$labels))
 pred <- predict(model, toyml, strategy = 'Ord', order = labels)
 
 # Passing a specif parameter for SVM predict method

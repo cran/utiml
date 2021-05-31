@@ -1,6 +1,20 @@
 # Changelog
 
-## utiml 0.1.6 (current)
+## utiml 0.1.7 (current)
+
+### Major changes
+* Removing support to SMO and J48 base algorithms due to incompatibilites
+* Removing method CTRL due to R dependencies issues
+
+### Bug fixes
+* Throws an error message for ps, ppt and eps when all labelsets are pruned
+* BugFix ps, ppt and eps when there is no labelsets to prune
+* Weights passed incorrectly to `xgboost` by base learner
+* Stop modifying the the .GlobalEnv, by changing .Random.seed 
+* Improvement in RAkEL letting the user define any value for m
+* Improving documentation of some methods
+
+## utiml 0.1.6
 * Fixes for CRAN incompatibilities
 
 ## utiml 0.1.5

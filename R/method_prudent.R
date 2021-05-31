@@ -42,9 +42,9 @@
 #' model <- prudent(toyml, "RANDOM")
 #' pred <- predict(model, toyml)
 #'
-#' \dontrun{
-#' # Use different phi correlation with J48 classifier
-#' model <- prudent(toyml, 'J48', 0.3)
+#' \donttest{
+#' # Use different phi correlation with C5.0 classifier
+#' model <- prudent(toyml, 'C5.0', 0.3)
 #'
 #' # Set a specific parameter
 #' model <- prudent(toyml, 'KNN', k=5)
@@ -64,8 +64,6 @@ prudent <- function(mdata, base.algorithm = getOption("utiml.base.algorithm", "S
   if (cores < 1) {
     stop("Cores must be a positive value")
   }
-
-  utiml_preserve_seed()
 
   # PruDent Model class
   pdmodel <- list(
@@ -103,7 +101,6 @@ prudent <- function(mdata, base.algorithm = getOption("utiml.base.algorithm", "S
     mmodel
   }, cores, seed)
 
-  utiml_restore_seed()
   class(pdmodel) <- "PruDentmodel"
   pdmodel
 }
@@ -129,7 +126,7 @@ prudent <- function(mdata, base.algorithm = getOption("utiml.base.algorithm", "S
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Predict SVM scores
 #' model <- prudent(toyml)
 #' pred <- predict(model, toyml)
@@ -154,7 +151,6 @@ predict.PruDentmodel <- function(object, newdata,
     stop("Cores must be a positive value")
   }
 
-  utiml_preserve_seed()
   newdata <- utiml_newdata(newdata)
 
   # 1 Iteration - Base level
@@ -193,7 +189,6 @@ predict.PruDentmodel <- function(object, newdata,
     predictions[[i]]$bipartition[baseinst] <- base.preds[baseinst, i]
   }
 
-  utiml_restore_seed()
   utiml_predict(predictions, probability)
 }
 
@@ -236,6 +231,9 @@ utiml_labels_IG <- function (mdata) {
 #' Print PruDent model
 #' @param x The prudent model
 #' @param ... ignored
+#'
+#' @return No return value, called for print model's detail
+#'
 #' @export
 print.PruDentmodel <- function(x, ...) {
   cat("Classifier PruDent\n\nCall:\n")

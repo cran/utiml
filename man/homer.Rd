@@ -60,7 +60,7 @@ multilabel classifiers, each one dealing with a much smaller set of labels.
 model <- homer(toyml, "RANDOM")
 pred <- predict(model, toyml)
 
-\dontrun{
+\donttest{
 ##Change default configurations
 model <- homer(toyml, "RF", clusters=5, method="clustering", iteration=10)
 }
@@ -77,7 +77,6 @@ Other Transformation methods:
 \code{\link{br}()},
 \code{\link{cc}()},
 \code{\link{clr}()},
-\code{\link{ctrl}()},
 \code{\link{dbr}()},
 \code{\link{ebr}()},
 \code{\link{ecc}()},

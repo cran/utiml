@@ -39,9 +39,9 @@
 #' model <- dbr(toyml, "RANDOM")
 #' pred <- predict(model, toyml)
 #'
-#' \dontrun{
-#' # Use Random Forest as base algorithm and 4 cores
-#' model <- dbr(toyml, 'RF', cores = 4)
+#' \donttest{
+#' # Use Random Forest as base algorithm and 2 cores
+#' model <- dbr(toyml, 'RF', cores = 2)
 #' }
 dbr <- function(mdata,
                 base.algorithm = getOption("utiml.base.algorithm", "SVM"),
@@ -56,8 +56,6 @@ dbr <- function(mdata,
   if (cores < 1) {
     stop("Cores must be a positive value")
   }
-
-  utiml_preserve_seed()
 
   # DBR Model class
   dbrmodel <- list(labels = rownames(mdata$labels), call = match.call())
@@ -81,8 +79,6 @@ dbr <- function(mdata,
       ), ...
     )
   }, cores, seed)
-
-  utiml_restore_seed()
 
   class(dbrmodel) <- "DBRmodel"
   dbrmodel
@@ -122,7 +118,7 @@ dbr <- function(mdata,
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Predict SVM scores
 #' model <- dbr(toyml)
 #' pred <- predict(model, toyml)
@@ -152,8 +148,6 @@ predict.DBRmodel <- function(object, newdata, estimative = NULL,
     stop("Cores must be a positive value")
   }
 
-  utiml_preserve_seed()
-
   newdata <- utiml_newdata(newdata)
   if (is.null(estimative)) {
     estimative <- predict.BRmodel(object$estimation, newdata,
@@ -177,13 +171,15 @@ predict.DBRmodel <- function(object, newdata, estimative = NULL,
                                ...)
   }, cores, seed)
 
-  utiml_restore_seed()
   utiml_predict(predictions, probability)
 }
 
 #' Print DBR model
 #' @param x The dbr model
 #' @param ... ignored
+#'
+#' @return No return value, called for print model's detail
+#'
 #' @export
 print.DBRmodel <- function(x, ...) {
   cat("Classifier DBR\n\nCall:\n")

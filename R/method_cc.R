@@ -40,16 +40,16 @@
 #' model <- cc(toyml, "RANDOM")
 #' pred <- predict(model, toyml)
 #'
-#' \dontrun{
-#' # Use a specific chain with J48 classifier
+#' \donttest{
+#' # Use a specific chain with C5.0 classifier
 #' mychain <- sample(rownames(toyml$labels))
-#' model <- cc(toyml, 'J48', mychain)
+#' model <- cc(toyml, 'C5.0', mychain)
 #'
 #' # Set a specific parameter
 #' model <- cc(toyml, 'KNN', k=5)
 #'
 #' #Run with multiple-cores
-#' model <- cc(toyml, 'RF', cores = 5, seed = 123)
+#' model <- cc(toyml, 'RF', cores = 2, seed = 123)
 #' }
 cc <- function(mdata, base.algorithm = getOption("utiml.base.algorithm", "SVM"),
                chain = NA, ..., cores = getOption("utiml.cores", 1),
@@ -64,8 +64,6 @@ cc <- function(mdata, base.algorithm = getOption("utiml.base.algorithm", "SVM"),
   if (!utiml_is_equal_sets(chain, labels)) {
     stop("Invalid chain (all labels must be on the chain)")
   }
-
-  utiml_preserve_seed()
 
   # CC Model class
   ccmodel <- list(labels = labels, chain = chain, call = match.call())
@@ -85,8 +83,6 @@ cc <- function(mdata, base.algorithm = getOption("utiml.base.algorithm", "SVM"),
         "mldCC", mdata$name, "cc", base.algorithm, chain.order = lidx
       ), ...)
   }, cores, seed)
-
-  utiml_restore_seed()
 
   class(ccmodel) <- "CCmodel"
   ccmodel
@@ -115,7 +111,7 @@ cc <- function(mdata, base.algorithm = getOption("utiml.base.algorithm", "SVM"),
 #' model <- cc(toyml, "RANDOM")
 #' pred <- predict(model, toyml)
 #'
-#' \dontrun{
+#' \donttest{
 #' # Predict SVM bipartitions
 #' pred <- predict(model, toyml, prob = FALSE)
 #'
@@ -131,7 +127,6 @@ predict.CCmodel <- function(object, newdata,
     stop("First argument must be an CCmodel object")
   }
 
-  utiml_preserve_seed()
   if (!anyNA(seed)) {
     set.seed(seed)
   }
@@ -144,13 +139,15 @@ predict.CCmodel <- function(object, newdata,
     newdata[[label]] <- factor(predictions[[label]]$bipartition, levels=c(0, 1))
   }
 
-  utiml_restore_seed()
   utiml_predict(predictions[object$labels], probability)
 }
 
 #' Print CC model
 #' @param x The cc model
 #' @param ... ignored
+#'
+#' @return No return value, called for print model's detail
+#'
 #' @export
 print.CCmodel <- function(x, ...) {
   cat("Classifier Chains Model\n\nCall:\n")

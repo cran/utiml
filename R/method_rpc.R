@@ -32,9 +32,6 @@
 #' @examples
 #' model <- rpc(toyml, "RANDOM")
 #' pred <- predict(model, toyml)
-#'
-#' \dontrun{
-#' }
 rpc <- function(mdata,
                 base.algorithm = getOption("utiml.base.algorithm", "SVM"), ...,
                 cores = getOption("utiml.cores", 1),
@@ -47,8 +44,6 @@ rpc <- function(mdata,
   if (cores < 1) {
     stop("Cores must be a positive value")
   }
-
-  utiml_preserve_seed()
 
   # RPC Model class
   rpcmodel <- list(labels = rownames(mdata$labels), call = match.call())
@@ -65,8 +60,6 @@ rpc <- function(mdata,
       ), ...
     )
   }, cores, seed)
-
-  utiml_restore_seed()
 
   class(rpcmodel) <- "RPCmodel"
   rpcmodel
@@ -96,9 +89,6 @@ rpc <- function(mdata,
 #' @examples
 #' model <- rpc(toyml, "RANDOM")
 #' pred <- predict(model, toyml)
-#'
-#' \dontrun{
-#' }
 predict.RPCmodel <- function(object, newdata,
                             probability = getOption("utiml.use.probs", TRUE),
                             ..., cores = getOption("utiml.cores", 1),
@@ -112,15 +102,11 @@ predict.RPCmodel <- function(object, newdata,
     stop("Cores must be a positive value")
   }
 
-  utiml_preserve_seed()
-
   # Create models
   newdata <- utiml_newdata(newdata)
   labels <- utiml_rename(object$labels)
   predictions <- utiml_lapply(object$models, utiml_predict_binary_model,
                               newdata = newdata, ..., cores, seed)
-
-  utiml_restore_seed()
 
   # Compute votes
   labels <- utils::combn(object$labels, 2, simplify=FALSE)
@@ -137,6 +123,9 @@ predict.RPCmodel <- function(object, newdata,
 #' Print RPC model
 #' @param x The br model
 #' @param ... ignored
+#'
+#' @return No return value, called for print model's detail
+#'
 #' @export
 print.RPCmodel <- function(x, ...) {
   cat("RPC Model\n\nCall:\n")

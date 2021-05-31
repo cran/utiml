@@ -51,7 +51,7 @@ training and testing by querying the clustering results.
 model <- lift(toyml, "RANDOM")
 pred <- predict(model, toyml)
 
-\dontrun{
+\donttest{
 # Runing lift with a specific ratio
 model <- lift(toyml, "RF", 0.15)
 }
@@ -67,7 +67,6 @@ Other Transformation methods:
 \code{\link{br}()},
 \code{\link{cc}()},
 \code{\link{clr}()},
-\code{\link{ctrl}()},
 \code{\link{dbr}()},
 \code{\link{ebr}()},
 \code{\link{ecc}()},

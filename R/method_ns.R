@@ -38,10 +38,10 @@
 #' model <- ns(toyml, "RANDOM")
 #' pred <- predict(model, toyml)
 #'
-#' \dontrun{
-#' # Use a specific chain with J48 classifier
+#' \donttest{
+#' # Use a specific chain with C5.0 classifier
 #' mychain <- sample(rownames(toyml$labels))
-#' model <- ns(toyml, 'J48', mychain)
+#' model <- ns(toyml, 'C5.0', mychain)
 #'
 #' # Set a specific parameter
 #' model <- ns(toyml, 'KNN', k=5)
@@ -60,7 +60,6 @@ ns <- function(mdata, base.algorithm = getOption("utiml.base.algorithm", "SVM"),
     stop("Invalid chain (all labels must be on the chain)")
   }
 
-  utiml_preserve_seed()
   if (!anyNA(seed)) {
     set.seed(seed)
   }
@@ -96,7 +95,6 @@ ns <- function(mdata, base.algorithm = getOption("utiml.base.algorithm", "SVM"),
     nsmodel$models[[label]] <- model
   }
 
-  utiml_restore_seed()
   class(nsmodel) <- "NSmodel"
   nsmodel
 }
@@ -126,7 +124,7 @@ ns <- function(mdata, base.algorithm = getOption("utiml.base.algorithm", "SVM"),
 #' model <- ns(toyml, "RANDOM")
 #' pred <- predict(model, toyml)
 #'
-#' \dontrun{
+#' \donttest{
 #' # Predict SVM bipartitions
 #' pred <- predict(model, toyml, probability = FALSE)
 #'
@@ -142,7 +140,6 @@ predict.NSmodel <- function(object, newdata,
     stop("First argument must be an NSmodel object")
   }
 
-  utiml_preserve_seed()
   if (!anyNA(seed)) {
     set.seed(seed)
   }
@@ -158,7 +155,6 @@ predict.NSmodel <- function(object, newdata,
     names(newdata)[ncol(newdata)] <- label
   }
 
-  utiml_restore_seed()
   subset_correction(utiml_predict(predictions[object$labels], probability),
                     object$labelsets, probability)
 }
@@ -166,6 +162,9 @@ predict.NSmodel <- function(object, newdata,
 #' Print NS model
 #' @param x The ns model
 #' @param ... ignored
+#'
+#' @return No return value, called for print model's detail
+#'
 #' @export
 print.NSmodel <- function(x, ...) {
     cat("Nested Stacking Model\n\nCall:\n")

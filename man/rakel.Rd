@@ -37,7 +37,8 @@ than 1 require the \pkg{parallel} package. (Default:
 \code{options("utiml.cores", 1)})}
 
 \item{seed}{An optional integer used to set the seed. This is useful when
-the method is run in parallel. (Default: \code{options("utiml.seed", NA)})}
+the method is running in parallel. (Default:
+\code{options("utiml.seed", NA)})}
 }
 \value{
 An object of class \code{RAkELmodel} containing the set of fitted
@@ -59,7 +60,7 @@ for constructing the labelsets are the disjoint and overlapping labelsets.
 \examples{
 model <- rakel(toyml, "RANDOM")
 pred <- predict(model, toyml)
-\dontrun{
+\donttest{
 ## SVM using k = 4 and m = 100
 model <- rakel(toyml, "SVM", k=4, m=100)
 
@@ -78,7 +79,6 @@ Other Transformation methods:
 \code{\link{br}()},
 \code{\link{cc}()},
 \code{\link{clr}()},
-\code{\link{ctrl}()},
 \code{\link{dbr}()},
 \code{\link{ebr}()},
 \code{\link{ecc}()},

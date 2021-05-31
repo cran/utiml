@@ -36,9 +36,6 @@
 #' @examples
 #' model <- clr(toyml, "RANDOM")
 #' pred <- predict(model, toyml)
-#'
-#' \dontrun{
-#' }
 clr <- function(mdata,
                 base.algorithm = getOption("utiml.base.algorithm", "SVM"), ...,
                 cores = getOption("utiml.cores", 1),
@@ -89,9 +86,6 @@ clr <- function(mdata,
 #' @examples
 #' model <- clr(toyml, "RANDOM")
 #' pred <- predict(model, toyml)
-#'
-#' \dontrun{
-#' }
 predict.CLRmodel <- function(object, newdata,
                             probability = getOption("utiml.use.probs", TRUE),
                             ..., cores = getOption("utiml.cores", 1),
@@ -105,8 +99,6 @@ predict.CLRmodel <- function(object, newdata,
     stop("Cores must be a positive value")
   }
 
-  utiml_preserve_seed()
-
   # Predict RPC models
   predictions <- as.matrix(predict.RPCmodel(object$rpcmodel, newdata, TRUE,
                                             ..., cores=cores, seed=seed))
@@ -116,8 +108,6 @@ predict.CLRmodel <- function(object, newdata,
   calibrated <- as.matrix(predict.BRmodel(object$brmodel, newdata, FALSE, ...,
                                           cores=cores, seed=seed))
   options(utiml.empty.prediction = previous.value)
-
-  utiml_restore_seed()
 
   # Compute votes
   l0 <- (length(object$labels) - rowSums(calibrated)) / length(object$labels)
@@ -129,6 +119,9 @@ predict.CLRmodel <- function(object, newdata,
 #' Print CLR model
 #' @param x The br model
 #' @param ... ignored
+#'
+#' @return No return value, called for print model's detail
+#'
 #' @export
 print.CLRmodel <- function(x, ...) {
   cat("CLR Model\n\nCall:\n")

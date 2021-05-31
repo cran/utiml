@@ -22,7 +22,8 @@
 #'  than 1 require the \pkg{parallel} package. (Default:
 #'  \code{options("utiml.cores", 1)})
 #' @param seed An optional integer used to set the seed. This is useful when
-#'  the method is run in parallel. (Default: \code{options("utiml.seed", NA)})
+#'  the method is running in parallel. (Default:
+#'  \code{options("utiml.seed", NA)})
 #' @return An object of class \code{RAkELmodel} containing the set of fitted
 #'   models, including:
 #'   \describe{
@@ -39,7 +40,7 @@
 #' @examples
 #' model <- rakel(toyml, "RANDOM")
 #' pred <- predict(model, toyml)
-#' \dontrun{
+#' \donttest{
 #' ## SVM using k = 4 and m = 100
 #' model <- rakel(toyml, "SVM", k=4, m=100)
 #'
@@ -61,22 +62,20 @@ rakel <- function (mdata,
     labels = rownames(mdata$labels),
     overlapping = overlapping,
     k = k,
-    m = ifelse(overlapping,
-               min(m, base::choose(mdata$measures$num.labels, k)),
-               ceiling(mdata$measures$num.labels / k)),
+    m = ifelse(overlapping, m, ceiling(mdata$measures$num.labels / k)),
     labelsets = list(),
     call = match.call()
   )
 
-  utiml_preserve_seed()
   if (!anyNA(seed)) {
     set.seed(seed)
   }
 
   if (overlapping) {
     #RAkEL overllaping
-    rkmodel$labelsets <- sample(utils::combn(rkmodel$labels, k, simplify=FALSE),
-                                rkmodel$m)
+    rkmodel$labelsets <- lapply(seq(rkmodel$m), function(i) {
+      sample(rkmodel$labels, k)
+    })
 
     #TODO validate if all labels are used
 
@@ -100,7 +99,6 @@ rakel <- function (mdata,
     lp(data, base.algorithm = base.algorithm, ...)
   }, cores, seed)
 
-  utiml_restore_seed()
   class(rkmodel) <- "RAkELmodel"
   rkmodel
 }
@@ -142,7 +140,6 @@ predict.RAkELmodel <- function(object, newdata,
   options(utiml.empty.prediction = TRUE)
 
   newdata <- utiml_newdata(newdata)
-  utiml_preserve_seed()
 
   results <- utiml_lapply(object$models, function (lpmodel){
     predict.LPmodel(lpmodel, newdata)
@@ -168,7 +165,6 @@ predict.RAkELmodel <- function(object, newdata,
   }
   rm(results)
 
-  utiml_restore_seed()
   options(utiml.empty.prediction = previous.value)
 
   prediction
@@ -177,6 +173,9 @@ predict.RAkELmodel <- function(object, newdata,
 #' Print RAkEL model
 #' @param x The rakel model
 #' @param ... ignored
+#'
+#' @return No return value, called for print model's detail
+#'
 #' @export
 print.RAkELmodel <- function(x, ...) {
   cat("RAkEL",ifelse(x$overlapping, "Overlapping", "Disjoint"), "Model")

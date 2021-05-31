@@ -26,18 +26,18 @@
 #'    \item{model}{A LP model contained only the most common labelsets.}
 #'   }
 #' @references
-#'  Read, J. (2008). A pruned problem transformation method for multi-label
-#'  classification. In Proceedings of the New Zealand Computer Science Research
-#'  Student Conference (pp. 143-150).
+#'  Read, J., Pfahringer, B., & Holmes, G. (2008). Multi-label classification
+#'   using ensembles of pruned sets. In Proceedings - IEEE International
+#'   Conference on Data Mining, ICDM (pp. 995–1000).
 #' @export
 #'
 #' @examples
 #' model <- ps(toyml, "RANDOM")
 #' pred <- predict(model, toyml)
 #'
-#' \dontrun{
+#' \donttest{
 #' ##Change default configurations
-#' model <- ps(toyml, "RF", p=4, strategy="B", b=4)
+#' model <- ps(toyml, "RF", p=4, strategy="B", b=1)
 #' }
 ps <- function (mdata,
                 base.algorithm = getOption("utiml.base.algorithm", "SVM"),
@@ -59,8 +59,6 @@ ps <- function (mdata,
     stop("The parameter b must be greater or equal than 0")
   }
 
-  utiml_preserve_seed()
-
   # PS Model class
   psmodel <- list(labels = rownames(mdata$labels),
                   p = p,
@@ -69,9 +67,13 @@ ps <- function (mdata,
                   call = match.call())
 
   common.labelsets <- names(which(mdata$labelsets > p))
+  if (length(common.labelsets) == 0) {
+    stop(paste("All labelsets appear less than", p,
+               "time(s) in the training data."))
+  }
   instances <- apply(mdata$dataset[, mdata$labels$index], 1, paste, collapse='')
   original.instances <- instances %in% common.labelsets
-  removed.instances <- which(!original.instances)
+  rem.inst <- which(!original.instances)
 
   labelsets <- lapply(common.labelsets, function (x) {
     as.numeric(unlist(strsplit(x, '')))
@@ -84,26 +86,33 @@ ps <- function (mdata,
     #Strategy B: use only subsets of size greater than b
     labelsets <- labelsets[unlist(lapply(labelsets, sum)) > b]
     b <- length(labelsets)
+    if (b == 0) {
+      stop("There is no labelsets greater than the b value")
+    }
   }
 
-  Si <- mdata$dataset[removed.instances, mdata$labels$index]
-  has.match <- do.call(cbind, lapply(labelsets, function (ls) {
-    colSums(ls == 1 & ls == t(Si)) == sum(ls)
-  }))
-  rm(Si)
+  if (length(rem.inst) == 0) {
+    ndata <- mdata
+  } else {
+    Si <- mdata$dataset[rem.inst, mdata$labels$index]
+    has.match <- do.call(cbind, lapply(labelsets, function (ls) {
+      colSums(ls == 1 & ls == t(Si)) == sum(ls)
+    }))
+    rm(Si)
 
-  inst.lab <- lapply(
-    lapply(split(has.match,seq(nrow(has.match))),which),
-    function (lbls){
-      utiml_ifelse(length(lbls) > 0, c(lbls[seq(min(length(lbls), b))]), c())
-    }
-  )
-  rm(has.match)
+    inst.lab <- lapply(
+      lapply(split(has.match,seq(nrow(has.match))),which),
+      function (lbls){
+        utiml_ifelse(length(lbls) > 0, c(lbls[seq(min(length(lbls), b))]), c())
+      }
+    )
+    rm(has.match)
 
-  ndata <- merge_pruned_instances(mdata, removed.instances, inst.lab, labelsets)
+    ndata <- merge_pruned_instances(mdata, rem.inst, inst.lab, labelsets)
+  }
+
   psmodel$model <- lp(ndata, base.algorithm=base.algorithm, seed=seed)
 
-  utiml_restore_seed()
   class(psmodel) <- "PSmodel"
 
   psmodel
@@ -174,6 +183,9 @@ predict.PSmodel <- function(object, newdata,
 #' Print PS model
 #' @param x The ps model
 #' @param ... ignored
+#'
+#' @return No return value, called for print model's detail
+#'
 #' @export
 print.PSmodel <- function(x, ...) {
   cat("Pruned Set Model\n\nCall:\n")
